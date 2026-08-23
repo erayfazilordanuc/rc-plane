@@ -1,1 +1,18 @@
-/~$Alınacak Malzemeler.xlsx
+# --- Alinacak malzeme listeleri (kisisel notlar / fiyat bilgisi) ---
+*.xlsx
+*.xls
+~$*
+
+# --- PlatformIO ---
+.pio/
+build/
+libraries/
+
+# --- Editor ---
+.vscode/
+.idea/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
