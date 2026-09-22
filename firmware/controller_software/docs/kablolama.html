@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RC-Plane-TX Kablolaması</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#eef1f4; --surface:#f9fbfc; --ink:#16202b; --muted:#5a6776; --rule:#d2d9e1; --accent:#2f5d8a;
+  --pcb:#1f2a37; --pcb-ink:#dbe3ec; --pcb-mute:#7d8b9a; --pad:#c49a3c; --metal:#b7c0ca; --metal-ink:#2a3441;
+  --rf:#17332b; --rf-ink:#cfe3d8; --casing:#2b3542; --warn:#a4560c; --warn-bg:#f8ecdc;
+  --w-red:#d93a2f; --w-black:#15181c; --w-blue:#2b63d9; --w-mag:#cc36ad; --w-orange:#ec8a1a; --w-cyan:#1fb6cc; --w-green:#2ea24c;
+  --sans:"Archivo", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0f151b; --surface:#161e27; --ink:#e2e8ee; --muted:#92a0af; --rule:#27323e; --accent:#86b0dc;
+    --pcb:#253344; --pcb-ink:#dbe3ec; --pcb-mute:#8290a0; --pad:#c9a24a; --metal:#8e98a3; --metal-ink:#1a2129;
+    --rf:#1c3b32; --rf-ink:#cfe3d8; --casing:#b3bdc8; --warn:#e7a257; --warn-bg:#2a2117; --w-black:#0b0d10;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0f151b; --surface:#161e27; --ink:#e2e8ee; --muted:#92a0af; --rule:#27323e; --accent:#86b0dc;
+  --pcb:#253344; --pcb-ink:#dbe3ec; --pcb-mute:#8290a0; --pad:#c9a24a; --metal:#8e98a3; --metal-ink:#1a2129;
+  --rf:#1c3b32; --rf-ink:#cfe3d8; --casing:#b3bdc8; --warn:#e7a257; --warn-bg:#2a2117; --w-black:#0b0d10;
+}
+
+*{box-sizing:border-box}
+body{background:var(--ground); color:var(--ink); font-family:var(--sans); font-size:15px; line-height:1.55;
+  padding-block:40px 64px; padding-inline:20px; margin:0}
+.wrap{max-width:1040px; margin:0 auto; display:grid; gap:36px}
+
+header{display:grid; gap:10px; max-width:68ch}
+.eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--muted)}
+h1{font-size:clamp(28px,4.2vw,40px); line-height:1.1; margin:0; font-weight:700; letter-spacing:-.01em; text-wrap:balance}
+.lead{margin:0; color:var(--muted); font-size:16px}
+.lead b{color:var(--ink); font-weight:600}
+code{font-family:var(--mono); font-size:.92em}
+
+figure{margin:0; background:var(--surface); border:1px solid var(--rule); border-radius:6px; display:grid}
+.scroll{overflow-x:auto; padding:18px 14px 6px}
+figure svg{display:block; width:100%; min-width:760px; height:auto}
+figcaption{padding:12px 18px 16px; border-top:1px solid var(--rule); color:var(--muted); font-size:13.5px}
+
+/* SVG parcalari */
+.pcb{fill:var(--pcb)} .rfpcb{fill:var(--rf)} .metal{fill:var(--metal)} .pad{fill:var(--pad)}
+.ant{fill:none; stroke:var(--pad); stroke-width:2}
+.t{font-family:var(--mono); font-size:11px}
+.t-on{fill:var(--pcb-ink); font-weight:500} .t-off{fill:var(--pcb-mute)}
+.t-rf{fill:var(--rf-ink)} .t-metal{fill:var(--metal-ink); font-size:10px}
+.t-ink{fill:var(--ink)} .t-mute{fill:var(--muted)}
+.t-head{font-family:var(--sans); font-size:13px; font-weight:600; fill:var(--ink)}
+.chip{fill:#0d1114}
+.leg{stroke:var(--metal); stroke-width:3; fill:none}
+.cap{fill:#2d4f8f} .capstripe{fill:#b9c7de} .t-cap{fill:#ffffff; font-family:var(--sans); font-size:13px; font-weight:700}
+.casing{fill:none; stroke:var(--casing); stroke-width:7; stroke-linecap:round; stroke-linejoin:round}
+.wire{fill:none; stroke-width:4; stroke-linecap:round; stroke-linejoin:round}
+
+section{display:grid; gap:14px}
+h2{font-size:19px; margin:0; font-weight:600; text-wrap:balance}
+.tbl{overflow-x:auto; border:1px solid var(--rule); border-radius:6px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:560px; font-variant-numeric:tabular-nums}
+th,td{text-align:left; padding:10px 14px; border-bottom:1px solid var(--rule); vertical-align:middle}
+tr:last-child td{border-bottom:0}
+th{font-size:11.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); font-weight:600}
+td.m{font-family:var(--mono); font-size:13.5px}
+td.dim{color:var(--muted)}
+.sw{display:inline-flex; align-items:center; gap:8px}
+.sw i{width:26px; height:8px; border-radius:4px; box-shadow:0 0 0 1px var(--casing); display:inline-block}
+.tag{font-size:12px; font-weight:600; color:var(--warn)}
+
+.notes{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px}
+.note{border:1px solid var(--rule); border-radius:6px; padding:14px 16px; background:var(--surface); display:grid; gap:6px; align-content:start}
+.note.warn{background:var(--warn-bg); border-color:transparent}
+.note h3{margin:0; font-size:14.5px; font-weight:600}
+.note.warn h3{color:var(--warn)}
+.note p{margin:0; font-size:14px; color:var(--muted); max-width:62ch}
+.note.warn p{color:var(--ink)}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">controller_software · ESP32 DevKit (ESP-WROOM-32) + nRF24L01</div>
+    <h1>RC-Plane-TX Kablolaması</h1>
+    <p class="lead">Kumandada kablo gereken tek harici parça <b>nRF24L01</b>. ESP-NOW kartın kendi radyosunu kullanır, kablo istemez. Yedi kablonun <b>yedisi de DevKit'in sağ pin sırasına</b> gelir; SPI hattı donanım VSPI pinlerinde, <code>4&nbsp;MHz</code>'de çalışır.</p>
+  </header>
+
+  <figure>
+    <div class="scroll">
+      <svg viewBox="0 0 940 596" role="img" aria-label="ESP32 DevKit V1 sağ pin sırasından nRF24L01'e yedi kablo: GPIO23 MOSI camgöbeği, GPIO19 MISO yeşil, GPIO18 SCK turuncu, GPIO5 CSN magenta, GPIO4 CE mavi, GND siyah, 3V3 kırmızı VCC. VCC ile GND arasında 10-100 mikrofarad kondansatör. IRQ bağlı değil.">
+        <!-- ===== ESP32 DevKit V1 (30 pin) ===== -->
+        <text class="t-head" x="80" y="26">ESP32 DevKit V1 · 30 pin</text>
+        <rect class="pcb" x="80" y="40" width="220" height="516" rx="8"/>
+        <!-- WROOM modulu -->
+        <rect class="rfpcb" x="146" y="48" width="88" height="48" rx="2" style="fill:var(--pcb)"/>
+        <polyline class="ant" points="156,86 156,58 170,58 170,86 184,86 184,58 198,58 198,86 212,86 212,58 224,58"/>
+        <rect class="metal" x="148" y="98" width="84" height="140" rx="3"/>
+        <text class="t t-metal" x="190" y="164" text-anchor="middle">ESP-WROOM</text>
+        <text class="t t-metal" x="190" y="178" text-anchor="middle">-32</text>
+        <!-- USB -->
+        <rect class="metal" x="170" y="546" width="40" height="28" rx="3"/>
+        <text class="t t-mute" x="190" y="592" text-anchor="middle">USB</text>
+
+        <!-- sol sira: pad + etiket (kullanilmiyor) -->
+        <g>
+          <circle class="pad" cx="100" cy="120" r="6"/><text class="t t-off" x="114" y="124">EN</text>
+          <circle class="pad" cx="100" cy="148" r="6"/><text class="t t-off" x="114" y="152">VP</text>
+          <circle class="pad" cx="100" cy="176" r="6"/><text class="t t-off" x="114" y="180">VN</text>
+          <circle class="pad" cx="100" cy="204" r="6"/><text class="t t-off" x="114" y="208">D34</text>
+          <circle class="pad" cx="100" cy="232" r="6"/><text class="t t-off" x="114" y="236">D35</text>
+          <circle class="pad" cx="100" cy="260" r="6"/><text class="t t-off" x="114" y="264">D32</text>
+          <circle class="pad" cx="100" cy="288" r="6"/><text class="t t-off" x="114" y="292">D33</text>
+          <circle class="pad" cx="100" cy="316" r="6"/><text class="t t-off" x="114" y="320">D25</text>
+          <circle class="pad" cx="100" cy="344" r="6"/><text class="t t-off" x="114" y="348">D26</text>
+          <circle class="pad" cx="100" cy="372" r="6"/><text class="t t-off" x="114" y="376">D27</text>
+          <circle class="pad" cx="100" cy="400" r="6"/><text class="t t-off" x="114" y="404">D14</text>
+          <circle class="pad" cx="100" cy="428" r="6"/><text class="t t-off" x="114" y="432">D12</text>
+          <circle class="pad" cx="100" cy="456" r="6"/><text class="t t-off" x="114" y="460">D13</text>
+          <circle class="pad" cx="100" cy="484" r="6"/><text class="t t-off" x="114" y="488">GND</text>
+          <circle class="pad" cx="100" cy="512" r="6"/><text class="t t-off" x="114" y="516">VIN</text>
+        </g>
+        <!-- sag sira -->
+        <g>
+          <circle class="pad" cx="280" cy="120" r="6"/><text class="t t-on"  x="266" y="124" text-anchor="end">D23</text>
+          <circle class="pad" cx="280" cy="148" r="6"/><text class="t t-off" x="266" y="152" text-anchor="end">D22</text>
+          <circle class="pad" cx="280" cy="176" r="6"/><text class="t t-off" x="266" y="180" text-anchor="end">TX0</text>
+          <circle class="pad" cx="280" cy="204" r="6"/><text class="t t-off" x="266" y="208" text-anchor="end">RX0</text>
+          <circle class="pad" cx="280" cy="232" r="6"/><text class="t t-off" x="266" y="236" text-anchor="end">D21</text>
+          <circle class="pad" cx="280" cy="260" r="6"/><text class="t t-on"  x="266" y="264" text-anchor="end">D19</text>
+          <circle class="pad" cx="280" cy="288" r="6"/><text class="t t-on"  x="266" y="292" text-anchor="end">D18</text>
+          <circle class="pad" cx="280" cy="316" r="6"/><text class="t t-on"  x="266" y="320" text-anchor="end">D5</text>
+          <circle class="pad" cx="280" cy="344" r="6"/><text class="t t-off" x="266" y="348" text-anchor="end">TX2</text>
+          <circle class="pad" cx="280" cy="372" r="6"/><text class="t t-off" x="266" y="376" text-anchor="end">RX2</text>
+          <circle class="pad" cx="280" cy="400" r="6"/><text class="t t-on"  x="266" y="404" text-anchor="end">D4</text>
+          <circle class="pad" cx="280" cy="428" r="6"/><text class="t t-off" x="266" y="432" text-anchor="end">D2</text>
+          <circle class="pad" cx="280" cy="456" r="6"/><text class="t t-off" x="266" y="460" text-anchor="end">D15</text>
+          <circle class="pad" cx="280" cy="484" r="6"/><text class="t t-on"  x="266" y="488" text-anchor="end">GND</text>
+          <circle class="pad" cx="280" cy="512" r="6"/><text class="t t-on"  x="266" y="516" text-anchor="end">3V3</text>
+        </g>
+
+        <!-- ===== nRF24L01 ===== -->
+        <text class="t-head" x="632" y="200">nRF24L01</text>
+        <text class="t t-mute" x="632" y="216">2×4 konnektör · kare pad = 1. bacak</text>
+        <rect class="rfpcb" x="632" y="228" width="278" height="176" rx="6"/>
+        <rect class="chip" x="828" y="294" width="40" height="40" rx="2"/>
+        <polyline class="ant" points="884,240 900,240 900,262 884,262 884,284 900,284 900,306 884,306 884,328 900,328 900,350 884,350 884,372 900,372 900,392"/>
+        <!-- satir etiketleri: sol isim dis sutundaki (tek) pine, sag isim ic sutundaki (cift) pine ait -->
+        <text class="t t-rf" x="722" y="264">7 MISO</text><text class="t t-rf" x="776" y="264" style="opacity:.6">8 IRQ</text>
+        <text class="t t-rf" x="722" y="300">5 SCK</text><text class="t t-rf" x="776" y="300">6 MOSI</text>
+        <text class="t t-rf" x="722" y="336">3 CE</text><text class="t t-rf" x="776" y="336">4 CSN</text>
+        <text class="t t-rf" x="722" y="372">1 GND</text><text class="t t-rf" x="776" y="372">2 VCC</text>
+
+        <!-- kondansator bacaklari (pinlerin uzerine lehimli) -->
+        <path class="leg" d="M660 368 V442"/>
+        <path class="leg" d="M700 368 V442"/>
+
+        <!-- pinler -->
+        <circle class="pad" cx="660" cy="260" r="7"/><circle class="pad" cx="700" cy="260" r="7" style="opacity:.55"/>
+        <circle class="pad" cx="660" cy="296" r="7"/><circle class="pad" cx="700" cy="296" r="7"/>
+        <circle class="pad" cx="660" cy="332" r="7"/><circle class="pad" cx="700" cy="332" r="7"/>
+        <rect   class="pad" x="653" y="361" width="14" height="14"/><circle class="pad" cx="700" cy="368" r="7"/>
+
+        <!-- kondansator -->
+        <rect class="cap" x="644" y="442" width="72" height="38" rx="9"/>
+        <path class="capstripe" d="M653 442 H664 V480 H653 A9 9 0 0 1 644 471 V451 A9 9 0 0 1 653 442 Z"/>
+        <text class="t-cap" x="654" y="466" text-anchor="middle" style="fill:#1b2a44">−</text>
+        <text class="t-cap" x="700" y="466" text-anchor="middle">+</text>
+        <text class="t t-ink" x="728" y="458">10–100 µF</text>
+        <text class="t t-mute" x="728" y="474">pinlere en yakın</text>
+        <text class="t t-mute" x="644" y="500">− GND · + VCC</text>
+
+        <!-- ===== kablolar: once kilif, sonra renk; sonra cizilen ustten gecer ===== -->
+        <g>
+          <path class="casing" d="M280 512 H540 V350 H700 V368"/>
+          <path class="wire" style="stroke:var(--w-red)" d="M280 512 H540 V350 H700 V368"/>
+
+          <path class="casing" d="M280 260 H660"/>
+          <path class="wire" style="stroke:var(--w-green)" d="M280 260 H660"/>
+
+          <path class="casing" d="M280 316 H700 V332"/>
+          <path class="wire" style="stroke:var(--w-mag)" d="M280 316 H700 V332"/>
+
+          <path class="casing" d="M280 288 H420 V296 H660"/>
+          <path class="wire" style="stroke:var(--w-orange)" d="M280 288 H420 V296 H660"/>
+
+          <path class="casing" d="M280 400 H500 V332 H660"/>
+          <path class="wire" style="stroke:var(--w-blue)" d="M280 400 H500 V332 H660"/>
+
+          <path class="casing" d="M280 484 H580 V368 H660"/>
+          <path class="wire" style="stroke:var(--w-black)" d="M280 484 H580 V368 H660"/>
+
+          <path class="casing" d="M280 120 H350 V278 H700 V296"/>
+          <path class="wire" style="stroke:var(--w-cyan)" d="M280 120 H350 V278 H700 V296"/>
+        </g>
+
+        <!-- kablo etiketleri: nRF24 tarafindaki sinyal adi -->
+        <text class="t t-ink" x="306" y="113">MOSI</text>
+        <text class="t t-ink" x="370" y="253">MISO</text>
+        <text class="t t-ink" x="306" y="281">SCK</text>
+        <text class="t t-ink" x="306" y="309">CSN</text>
+        <text class="t t-ink" x="306" y="393">CE</text>
+        <text class="t t-ink" x="306" y="477">GND</text>
+        <text class="t t-ink" x="306" y="505">VCC · 3V3</text>
+      </svg>
+    </div>
+    <figcaption>Pin sırası 30 pinli DOIT DevKit V1'e göre, bileşen tarafından bakılarak (anten yukarıda, USB aşağıda) çizildi. 38 pinli DevKitC'de sağ sıra aynı GPIO'ları taşır ama arada ek GND pinleri var ve 3V3 sol üsttedir; kartın üzerindeki GPIO etiketine göre bağla. nRF24 tarafındaki 2×4 düzen numaralandırmayı gösterir; gerçek modülde yönü kare pad (1 = GND) ve arkadaki baskıyla doğrula.</figcaption>
+  </figure>
+
+  <section>
+    <h2>Pin pin bağlantı</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>nRF24 bacağı</th><th>Sinyal</th><th>ESP32</th><th>Kablo</th><th>Not</th></tr></thead>
+        <tbody>
+          <tr><td class="m">1</td><td class="m">GND</td><td class="m">GND</td><td><span class="sw"><i style="background:var(--w-black)"></i>siyah</span></td><td class="dim">Kare pad</td></tr>
+          <tr><td class="m">2</td><td class="m">VCC</td><td class="m">3V3</td><td><span class="sw"><i style="background:var(--w-red)"></i>kırmızı</span></td><td><span class="tag">5V DEĞİL</span></td></tr>
+          <tr><td class="m">3</td><td class="m">CE</td><td class="m">GPIO4</td><td><span class="sw"><i style="background:var(--w-blue)"></i>mavi</span></td><td class="dim"></td></tr>
+          <tr><td class="m">4</td><td class="m">CSN</td><td class="m">GPIO5</td><td><span class="sw"><i style="background:var(--w-mag)"></i>magenta</span></td><td class="dim">VSPI CS</td></tr>
+          <tr><td class="m">5</td><td class="m">SCK</td><td class="m">GPIO18</td><td><span class="sw"><i style="background:var(--w-orange)"></i>turuncu</span></td><td class="dim">VSPI CLK</td></tr>
+          <tr><td class="m">6</td><td class="m">MOSI</td><td class="m">GPIO23</td><td><span class="sw"><i style="background:var(--w-cyan)"></i>camgöbeği</span></td><td class="dim">VSPI MOSI</td></tr>
+          <tr><td class="m">7</td><td class="m">MISO</td><td class="m">GPIO19</td><td><span class="sw"><i style="background:var(--w-green)"></i>yeşil</span></td><td class="dim">VSPI MISO</td></tr>
+          <tr><td class="m">8</td><td class="m">IRQ</td><td class="dim">—</td><td class="dim">bağlı değil</td><td class="dim">Yazılım kullanmıyor</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Bu kurulumda bozulan şeyler</h2>
+    <div class="notes">
+      <div class="note warn">
+        <h3>Konnektörü bir sıra kaydırmak modülü yakar</h3>
+        <p>1. bacak GND, 2. bacak VCC. Bir sıra kayarsa besleme ters gelir. Güç verdikten sonra modüle dokun; ılıksa hemen çek.</p>
+      </div>
+      <div class="note warn">
+        <h3>Kondansatör seçmeli değil</h3>
+        <p>VCC–GND arasına 10–100 µF, modül pinlerine olabildiğince yakın. Uzun bacak (+) VCC'ye, şeritli taraf (−) GND'ye. Olmazsa modül yayın anında çöker ve <code>radio.begin()</code> bazen geçer bazen geçmez.</p>
+      </div>
+      <div class="note">
+        <h3>SPI 4 MHz'de kalmalı</h3>
+        <p>Kütüphanenin 10 MHz varsayılanı dupont kablo ve breadboard'da güvenilir değil. Hangi hızın sağlam olduğunu görmek için <code>pio run -e rfdiag -t upload -t monitor</code>.</p>
+      </div>
+      <div class="note">
+        <h3>Uçak aynı GPIO'ları kullanır</h3>
+        <p>Uçak kartı (38 pinli ESP32 DevKitC) nRF24'ü aynı beş GPIO'ya bağlar; yalnızca 3V3 ve GND pinlerinin yeri karta göre değişir. Uçak şeması: <code>flight_software/docs/kablolama.html</code>.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+</html>

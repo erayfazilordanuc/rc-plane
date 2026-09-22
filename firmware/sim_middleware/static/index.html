@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="tr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>vJoy kopru testi</title>
+<!--
+  Telefon olmadan koprunun ucunu ucuna calistigini gormek icin kucuk bir
+  test paneli. Slider'lar 1000-2000 us uretiyor; simSetAxes() ile ayni
+  yoldan sunucuya gidiyor. Simulatorde ya da vJoy Monitor'da eksenlerin
+  oynadigini burada dogrula, sonra gercek arayuze gec.
+-->
+<style>
+  :root{ --bg:#0e1116; --fg:#e6edf3; --line:#232b36; --acc:#4da3ff; --thr:#ff9f2e; }
+  *{box-sizing:border-box}
+  body{margin:0;padding:18px;background:var(--bg);color:var(--fg);
+       font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  h1{font-size:17px;margin:0 0 4px}
+  p.sub{margin:0 0 18px;color:#8b98a8;font-size:13px}
+  .row{display:flex;align-items:center;gap:12px;margin:14px 0}
+  .row label{width:92px;color:#8b98a8;font-size:13px}
+  .row em{width:62px;text-align:right;font-style:normal;
+          font-variant-numeric:tabular-nums;color:var(--acc)}
+  input[type=range]{flex:1;height:30px;accent-color:var(--acc)}
+  .thr input[type=range]{accent-color:var(--thr)}
+  .thr em{color:var(--thr)}
+  #st{display:inline-block;padding:4px 10px;border-radius:6px;font-size:13px;
+      background:#2a1416;color:#ff6b6b}
+  #st.ok{background:#12251a;color:#2ee66b}
+  button{margin-top:16px;padding:9px 14px;border:1px solid var(--line);
+         border-radius:8px;background:#161b22;color:var(--fg);font-size:14px}
+</style>
+
+<h1>vJoy kopru testi</h1>
+<p class="sub">Slider'lar 1000-2000 us uretir, sunucu bunu 0-32767'ye cevirip vJoy'a yazar.</p>
+<div id="st">baglaniyor...</div>
+
+<div class="row">          <label>AIL &nbsp;X</label>  <input type="range" id="ail" min="1000" max="2000" value="1500"><em id="vail">1500</em></div>
+<div class="row">          <label>ELE &nbsp;Y</label>  <input type="range" id="ele" min="1000" max="2000" value="1500"><em id="vele">1500</em></div>
+<div class="row thr">      <label>THR &nbsp;Z</label>  <input type="range" id="thr" min="1000" max="2000" value="1000"><em id="vthr">1000</em></div>
+<div class="row">          <label>RUD &nbsp;RZ</label> <input type="range" id="rud" min="1000" max="2000" value="1500"><em id="vrud">1500</em></div>
+
+<button onclick="simPing()">RTT olc (konsola yazar)</button>
+<button onclick="center()">Notr</button>
+
+<script src="/socket.io.min.js"></script>
+<script src="/static/rc_sim_client.js"></script>
+<script>
+"use strict";
+
+/* Baglanti durumu rozetini rc_sim_client.js besliyor. */
+function simOnState(ok){
+  const el = document.getElementById("st");
+  el.textContent = ok ? "bagli" : "kopuk";
+  el.className   = ok ? "ok" : "";
+}
+
+/* ISTENEN NOKTA: oninput -> dogrudan simSetAxes(). Arada zamanlayici yok. */
+["ail","ele","thr","rud"].forEach(name => {
+  const s = document.getElementById(name);
+  const v = document.getElementById("v" + name);
+  s.addEventListener("input", () => {
+    v.textContent = s.value;
+    simSetAxes({ [name]: +s.value });
+  });
+});
+
+function center(){
+  const d = { ail:1500, ele:1500, thr:1000, rud:1500 };
+  for (const k in d){
+    document.getElementById(k).value = d[k];
+    document.getElementById("v" + k).textContent = d[k];
+  }
+  simSetAxes(d);
+}
+</script>
+</html>

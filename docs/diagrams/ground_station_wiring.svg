@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720" width="900" height="720" role="img" aria-label="Ground station wiring. ESP32 DevKit V1 to nRF24L01+: D23 MOSI, D19 MISO, D18 SCK, D5 CSN, D4 CE, GND, 3V3 to VCC with a 10-100 uF capacitor at the module pins.">
+
+<style>
+  .bg{fill:#f6f8fa} .card{fill:#ffffff;stroke:#d1d9e0;stroke-width:1}
+  .sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+  .ink{fill:#1f2328} .mute{fill:#59636e} .warn{fill:#9a4a00}
+  .h1{font-size:22px;font-weight:700} .h2{font-size:14px;font-weight:600} .sub{font-size:14px}
+  .s11{font-size:11px} .s12{font-size:12px} .s13{font-size:13px} .b{font-weight:700}
+  .pcb{fill:#1f2a37} .pcb2{fill:#2a3848} .pad{fill:#c49a3c} .metal{fill:#b7c0ca}
+  .t-on{fill:#e6edf3;font-weight:600} .t-off{fill:#7d8b9a} .t-flash{fill:#e0925a} .t-metal{fill:#2a3441}
+  .rf{fill:#17332b} .t-rf{fill:#cfe3d8} .t-rfm{fill:#7fa594}
+  .box{fill:#ffffff;stroke:#1f2328;stroke-width:1.5}
+  .thin{fill:none;stroke:#1f2328;stroke-width:2}
+  .plate{fill:none;stroke:#1f2328;stroke-width:3}
+  .dot{fill:#1f2328}
+  .cas{fill:none;stroke:#2b3542;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+  .w{fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+  .casp{fill:none;stroke:#2b3542;stroke-width:10;stroke-linecap:round;stroke-linejoin:round}
+  .p{fill:none;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+  .lead{fill:none;stroke:#2b3542;stroke-width:12;stroke-linecap:round;stroke-linejoin:round}
+  .dash{stroke-dasharray:9 7;stroke-linecap:butt}
+  .red{stroke:#d93a2f} .black{stroke:#15181c} .white{stroke:#f3f3f1} .yellow{stroke:#e2b21b}
+  .purple{stroke:#8456d4} .blue{stroke:#2b63d9} .mag{stroke:#cc36ad} .orange{stroke:#ec8a1a}
+  .cyan{stroke:#1fb6cc} .green{stroke:#2ea24c}
+  .antenna{fill:#1b1f24}
+  .outline{fill:#ffffff;stroke:#1f2328;stroke-width:1.5}
+  .fill2{fill:#eaeef2;stroke:#1f2328;stroke-width:1.5}
+  .dim{fill:none;stroke:#59636e;stroke-width:1}
+  .ext{fill:none;stroke:#8c959f;stroke-width:1;stroke-dasharray:3 3}
+  .spar{fill:none;stroke:#9a4a00;stroke-width:1.5;stroke-dasharray:6 4}
+  .brk{fill:none;stroke:#59636e;stroke-width:1.2;stroke-dasharray:4 3}
+  .arrow{fill:#59636e}
+  .rule{stroke:#d1d9e0;stroke-width:1}
+  .prop{fill:none;stroke:#2ea24c;stroke-width:4;stroke-linecap:round}
+  @media (prefers-color-scheme:dark){
+    .bg{fill:#0d1117} .card{fill:#151b23;stroke:#3d444d}
+    .ink{fill:#e6edf3} .mute{fill:#9198a1} .warn{fill:#f0a44b}
+    .pcb{fill:#253344} .pcb2{fill:#314258} .metal{fill:#8e98a3} .t-metal{fill:#1a2129}
+    .rf{fill:#1c3b32}
+    .box{fill:#1b222c;stroke:#c9d1d9} .thin{stroke:#c9d1d9} .plate{stroke:#c9d1d9} .dot{fill:#c9d1d9}
+    .cas,.casp,.lead{stroke:#b3bdc8} .black{stroke:#0b0d10}
+    .antenna{fill:#3a4350}
+    .outline{fill:#151b23;stroke:#c9d1d9} .fill2{fill:#222a35;stroke:#c9d1d9}
+    .dim{stroke:#9198a1} .arrow{fill:#9198a1} .ext{stroke:#6e7681} .brk{stroke:#9198a1}
+    .spar{stroke:#f0a44b} .rule{stroke:#3d444d}
+  }
+</style>
+
+<rect class="bg" x="0" y="0" width="900" height="720" rx="10"/>
+<text class="sans h1 ink" x="24" y="36">Ground station — radio wiring</text>
+
+<text class="sans sub mute" x="24" y="60">ESP32 DevKit V1 30-pin (WROOM-32) · nRF24L01+ PA/LNA · same five GPIOs as the aircraft</text>
+
+<g transform="translate(0 40)">
+<text class="sans s12 mute" x="180" y="58" text-anchor="middle">pin labels as printed on the board</text>
+
+<rect class="pcb" x="80" y="70" width="200" height="520" rx="8"/>
+<rect class="pcb2" x="140.0" y="78" width="80" height="24" rx="2"/>
+<polyline fill="none" stroke="#c49a3c" stroke-width="2" points="150.0,98 150.0,82 162.0,82 162.0,98 174.0,98 174.0,82 186.0,82 186.0,98 198.0,98 198.0,82 210.0,82 210.0,98"/>
+<rect class="metal" x="145.0" y="106" width="70" height="132" rx="3"/>
+<text class="mono s11 t-metal" x="180.0" y="166" text-anchor="middle">ESP32</text>
+<text class="mono s11 t-metal" x="180.0" y="180" text-anchor="middle">WROOM</text>
+<text class="mono s11 t-metal" x="180.0" y="194" text-anchor="middle">-32</text>
+<circle class="pad" cx="100" cy="130" r="6"/><text class="mono s12 t-off" x="114" y="134">EN</text>
+<circle class="pad" cx="100" cy="160" r="6"/><text class="mono s12 t-off" x="114" y="164">VP</text>
+<circle class="pad" cx="100" cy="190" r="6"/><text class="mono s12 t-off" x="114" y="194">VN</text>
+<circle class="pad" cx="100" cy="220" r="6"/><text class="mono s12 t-off" x="114" y="224">D34</text>
+<circle class="pad" cx="100" cy="250" r="6"/><text class="mono s12 t-off" x="114" y="254">D35</text>
+<circle class="pad" cx="100" cy="280" r="6"/><text class="mono s12 t-off" x="114" y="284">D32</text>
+<circle class="pad" cx="100" cy="310" r="6"/><text class="mono s12 t-off" x="114" y="314">D33</text>
+<circle class="pad" cx="100" cy="340" r="6"/><text class="mono s12 t-off" x="114" y="344">D25</text>
+<circle class="pad" cx="100" cy="370" r="6"/><text class="mono s12 t-off" x="114" y="374">D26</text>
+<circle class="pad" cx="100" cy="400" r="6"/><text class="mono s12 t-off" x="114" y="404">D27</text>
+<circle class="pad" cx="100" cy="430" r="6"/><text class="mono s12 t-off" x="114" y="434">D14</text>
+<circle class="pad" cx="100" cy="460" r="6"/><text class="mono s12 t-off" x="114" y="464">D12</text>
+<circle class="pad" cx="100" cy="490" r="6"/><text class="mono s12 t-off" x="114" y="494">D13</text>
+<circle class="pad" cx="100" cy="520" r="6"/><text class="mono s12 t-off" x="114" y="524">GND</text>
+<circle class="pad" cx="100" cy="550" r="6"/><text class="mono s12 t-off" x="114" y="554">VIN</text>
+<circle class="pad" cx="260" cy="130" r="6"/><text class="mono s12 t-on" x="246" y="134" text-anchor="end">D23</text>
+<circle class="pad" cx="260" cy="160" r="6"/><text class="mono s12 t-off" x="246" y="164" text-anchor="end">D22</text>
+<circle class="pad" cx="260" cy="190" r="6"/><text class="mono s12 t-off" x="246" y="194" text-anchor="end">TX0</text>
+<circle class="pad" cx="260" cy="220" r="6"/><text class="mono s12 t-off" x="246" y="224" text-anchor="end">RX0</text>
+<circle class="pad" cx="260" cy="250" r="6"/><text class="mono s12 t-off" x="246" y="254" text-anchor="end">D21</text>
+<circle class="pad" cx="260" cy="280" r="6"/><text class="mono s12 t-on" x="246" y="284" text-anchor="end">D19</text>
+<circle class="pad" cx="260" cy="310" r="6"/><text class="mono s12 t-on" x="246" y="314" text-anchor="end">D18</text>
+<circle class="pad" cx="260" cy="340" r="6"/><text class="mono s12 t-on" x="246" y="344" text-anchor="end">D5</text>
+<circle class="pad" cx="260" cy="370" r="6"/><text class="mono s12 t-off" x="246" y="374" text-anchor="end">TX2</text>
+<circle class="pad" cx="260" cy="400" r="6"/><text class="mono s12 t-off" x="246" y="404" text-anchor="end">RX2</text>
+<circle class="pad" cx="260" cy="430" r="6"/><text class="mono s12 t-on" x="246" y="434" text-anchor="end">D4</text>
+<circle class="pad" cx="260" cy="460" r="6"/><text class="mono s12 t-off" x="246" y="464" text-anchor="end">D2</text>
+<circle class="pad" cx="260" cy="490" r="6"/><text class="mono s12 t-off" x="246" y="494" text-anchor="end">D15</text>
+<circle class="pad" cx="260" cy="520" r="6"/><text class="mono s12 t-on" x="246" y="524" text-anchor="end">GND</text>
+<circle class="pad" cx="260" cy="550" r="6"/><text class="mono s12 t-on" x="246" y="554" text-anchor="end">3V3</text>
+<rect class="metal" x="160.0" y="580" width="40" height="22" rx="3"/>
+<text class="mono s11 mute" x="180.0" y="620" text-anchor="middle">USB</text>
+
+<path class="cas" d="M260 130 H300 V150 H560"/><path class="w cyan" d="M260 130 H300 V150 H560"/>
+
+<path class="cas" d="M260 280 H330 V190 H560"/><path class="w green" d="M260 280 H330 V190 H560"/>
+
+<path class="cas" d="M260 310 H360 V230 H560"/><path class="w orange" d="M260 310 H360 V230 H560"/>
+
+<path class="cas" d="M260 340 H390 V270 H560"/><path class="w mag" d="M260 340 H390 V270 H560"/>
+
+<path class="cas" d="M260 430 H420 V310 H560"/><path class="w blue" d="M260 430 H420 V310 H560"/>
+
+<path class="cas" d="M260 520 H450 V350 H560"/><path class="w black" d="M260 520 H450 V350 H560"/>
+
+<path class="cas" d="M260 550 H480 V390 H560"/><path class="w red" d="M260 550 H480 V390 H560"/>
+
+<path class="thin" d="M530 350 V365.0 M530 375.0 V390"/>
+<path class="plate" d="M518 365.0 Q530 370.0 542 365.0"/><path class="plate" d="M518 375.0 H542"/>
+<text class="sans s12 ink" x="546" y="387.0">+</text>
+<text class="sans s12 ink" x="552" y="418" text-anchor="end">10–100 µF</text>
+
+<circle class="dot" cx="530" cy="350" r="4"/>
+
+<circle class="dot" cx="530" cy="390" r="4"/>
+
+<rect class="rf" x="560" y="118" width="220" height="338" rx="6"/>
+<text class="sans h2 ink" x="560" y="106">nRF24L01+ PA/LNA</text>
+<circle class="pad" cx="560" cy="150" r="6"/><text class="mono s13 t-rf" x="576" y="154">MOSI</text>
+<text class="mono s12 t-rfm" x="626" y="154">pin 6</text>
+<circle class="pad" cx="560" cy="190" r="6"/><text class="mono s13 t-rf" x="576" y="194">MISO</text>
+<text class="mono s12 t-rfm" x="626" y="194">pin 7</text>
+<circle class="pad" cx="560" cy="230" r="6"/><text class="mono s13 t-rf" x="576" y="234">SCK</text>
+<text class="mono s12 t-rfm" x="626" y="234">pin 5</text>
+<circle class="pad" cx="560" cy="270" r="6"/><text class="mono s13 t-rf" x="576" y="274">CSN</text>
+<text class="mono s12 t-rfm" x="626" y="274">pin 4</text>
+<circle class="pad" cx="560" cy="310" r="6"/><text class="mono s13 t-rf" x="576" y="314">CE</text>
+<text class="mono s12 t-rfm" x="626" y="314">pin 3</text>
+<circle class="pad" cx="560" cy="350" r="6"/><text class="mono s13 t-rf" x="576" y="354">GND</text>
+<text class="mono s12 t-rfm" x="626" y="354">pin 1</text>
+<circle class="pad" cx="560" cy="390" r="6"/><text class="mono s13 t-rf" x="576" y="394">VCC</text>
+<text class="mono s12 t-rfm" x="626" y="394">pin 2</text>
+<circle class="pad" cx="560" cy="430" r="6" opacity=".45"/><text class="mono s13 t-rfm" x="576" y="434">IRQ</text>
+<text class="mono s12 t-rfm" x="626" y="434">pin 8 · n/c</text>
+<text class="sans s11 t-rf" x="738" y="148" text-anchor="middle">2×4 header</text>
+<rect class="pad" x="710" y="164" width="20" height="20"/><text class="mono s11 b t-metal" x="720" y="178" text-anchor="middle">1</text>
+<circle class="pad" cx="756" cy="174" r="10"/><text class="mono s11 b t-metal" x="756" y="178" text-anchor="middle">2</text>
+<circle class="pad" cx="720" cy="208" r="10"/><text class="mono s11 b t-metal" x="720" y="212" text-anchor="middle">3</text>
+<circle class="pad" cx="756" cy="208" r="10"/><text class="mono s11 b t-metal" x="756" y="212" text-anchor="middle">4</text>
+<circle class="pad" cx="720" cy="242" r="10"/><text class="mono s11 b t-metal" x="720" y="246" text-anchor="middle">5</text>
+<circle class="pad" cx="756" cy="242" r="10"/><text class="mono s11 b t-metal" x="756" y="246" text-anchor="middle">6</text>
+<circle class="pad" cx="720" cy="276" r="10"/><text class="mono s11 b t-metal" x="720" y="280" text-anchor="middle">7</text>
+<circle class="pad" cx="756" cy="276" r="10"/><text class="mono s11 b t-metal" x="756" y="280" text-anchor="middle">8</text>
+<text class="sans s11 t-rf" x="738" y="306" text-anchor="middle">square = pin 1</text>
+<rect class="metal" x="780" y="400" width="14" height="16" rx="2"/><rect class="antenna" x="786" y="218" width="14" height="186" rx="7"/>
+
+<rect class="card" x="500" y="478" width="380" height="188" rx="6"/>
+<text class="sans h2 ink" x="518" y="506">Notes</text>
+<text class="sans s13 ink" x="518" y="534">VCC → 3V3, never 5 V. One row off on the</text>
+<text class="sans s13 ink" x="518" y="558">2×4 header reverses the supply.</text>
+<text class="sans s13 ink" x="518" y="582">10–100 µF right at the module pins, or</text>
+<text class="sans s13 ink" x="518" y="606">radio.begin() succeeds only sometimes.</text>
+<text class="sans s13 ink" x="518" y="630">SPI runs at 4 MHz — dupont wire is not</text>
+<text class="sans s13 ink" x="518" y="654">reliable at the library's 10 MHz default.</text>
+
+</g>
+</svg>

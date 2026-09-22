@@ -3,16 +3,52 @@
 *.xls
 ~$*
 
+# --- Yerel calisma notlari / ajan ayarlari ---
+CLAUDE*
+YAPILACAKLAR.md
+.claude/
+
+# --- Ham medya ---
+# Ucus videolari 30-115 MB; GitHub 100 MB ustunu reddediyor ve README'de
+# depodaki .mp4 oynatilmiyor. Kisa klip GIF olarak airframe/ altina girer,
+# uzun video YouTube ya da GitHub web editorune surukle-birak ile eklenir.
+*.mp4
+*.MP4
+*.mov
+*.MOV
+
 # --- PlatformIO ---
+# Derleme ciktisi ve indirilen kutuphaneler (RF24 kopyasi ~5 MB, pio yeniden indirir)
 .pio/
+.piolibdeps/
 build/
 libraries/
+
+# --- Python (firmware/sim_middleware) ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+# socket.io istemcisi depoya girmiyor: sim_middleware/tools/fetch_client.py indirir
+firmware/sim_middleware/static/vendor/
+
+# --- Node (firmware/tools kosumlari; su an bagimlilik yok) ---
+node_modules/
+package-lock.json
 
 # --- Editor ---
 .vscode/
 .idea/
 
-# --- OS ---
+# --- Isletim sistemi ---
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# --- Gecici dosyalar ---
+scratch/
+tmp/
+*.tmp
+*.bak
+*.orig
+*.rej

@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 730" width="1000" height="730" role="img" aria-label="Airframe top, side and front views. Wingspan 1400 mm, constant 200 mm chord, 8 degree polyhedral breaks at plus/minus 320 mm, fuselage 1050 mm, wing leading edge 285 mm behind the firewall, CG 50 mm behind the leading edge on the spar line, stabiliser 400 by 150 mm.">
+
+<style>
+  .bg{fill:#f6f8fa} .card{fill:#ffffff;stroke:#d1d9e0;stroke-width:1}
+  .sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+  .ink{fill:#1f2328} .mute{fill:#59636e} .warn{fill:#9a4a00}
+  .h1{font-size:22px;font-weight:700} .h2{font-size:14px;font-weight:600} .sub{font-size:14px}
+  .s11{font-size:11px} .s12{font-size:12px} .s13{font-size:13px} .b{font-weight:700}
+  .pcb{fill:#1f2a37} .pcb2{fill:#2a3848} .pad{fill:#c49a3c} .metal{fill:#b7c0ca}
+  .t-on{fill:#e6edf3;font-weight:600} .t-off{fill:#7d8b9a} .t-flash{fill:#e0925a} .t-metal{fill:#2a3441}
+  .rf{fill:#17332b} .t-rf{fill:#cfe3d8} .t-rfm{fill:#7fa594}
+  .box{fill:#ffffff;stroke:#1f2328;stroke-width:1.5}
+  .thin{fill:none;stroke:#1f2328;stroke-width:2}
+  .plate{fill:none;stroke:#1f2328;stroke-width:3}
+  .dot{fill:#1f2328}
+  .cas{fill:none;stroke:#2b3542;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+  .w{fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+  .casp{fill:none;stroke:#2b3542;stroke-width:10;stroke-linecap:round;stroke-linejoin:round}
+  .p{fill:none;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+  .lead{fill:none;stroke:#2b3542;stroke-width:12;stroke-linecap:round;stroke-linejoin:round}
+  .dash{stroke-dasharray:9 7;stroke-linecap:butt}
+  .red{stroke:#d93a2f} .black{stroke:#15181c} .white{stroke:#f3f3f1} .yellow{stroke:#e2b21b}
+  .purple{stroke:#8456d4} .blue{stroke:#2b63d9} .mag{stroke:#cc36ad} .orange{stroke:#ec8a1a}
+  .cyan{stroke:#1fb6cc} .green{stroke:#2ea24c}
+  .antenna{fill:#1b1f24}
+  .outline{fill:#ffffff;stroke:#1f2328;stroke-width:1.5}
+  .fill2{fill:#eaeef2;stroke:#1f2328;stroke-width:1.5}
+  .dim{fill:none;stroke:#59636e;stroke-width:1}
+  .ext{fill:none;stroke:#8c959f;stroke-width:1;stroke-dasharray:3 3}
+  .spar{fill:none;stroke:#9a4a00;stroke-width:1.5;stroke-dasharray:6 4}
+  .brk{fill:none;stroke:#59636e;stroke-width:1.2;stroke-dasharray:4 3}
+  .arrow{fill:#59636e}
+  .rule{stroke:#d1d9e0;stroke-width:1}
+  .prop{fill:none;stroke:#2ea24c;stroke-width:4;stroke-linecap:round}
+  @media (prefers-color-scheme:dark){
+    .bg{fill:#0d1117} .card{fill:#151b23;stroke:#3d444d}
+    .ink{fill:#e6edf3} .mute{fill:#9198a1} .warn{fill:#f0a44b}
+    .pcb{fill:#253344} .pcb2{fill:#314258} .metal{fill:#8e98a3} .t-metal{fill:#1a2129}
+    .rf{fill:#1c3b32}
+    .box{fill:#1b222c;stroke:#c9d1d9} .thin{stroke:#c9d1d9} .plate{stroke:#c9d1d9} .dot{fill:#c9d1d9}
+    .cas,.casp,.lead{stroke:#b3bdc8} .black{stroke:#0b0d10}
+    .antenna{fill:#3a4350}
+    .outline{fill:#151b23;stroke:#c9d1d9} .fill2{fill:#222a35;stroke:#c9d1d9}
+    .dim{stroke:#9198a1} .arrow{fill:#9198a1} .ext{stroke:#6e7681} .brk{stroke:#9198a1}
+    .spar{stroke:#f0a44b} .rule{stroke:#3d444d}
+  }
+</style>
+
+<rect class="bg" x="0" y="0" width="1000" height="730" rx="10"/>
+<text class="sans s12 b mute" x="24" y="30">TOP VIEW</text>
+
+<rect class="fill2" x="110" y="354.2" width="441.0" height="31.5"/>
+<rect class="box" x="92" y="362" width="18" height="16" rx="2"/>
+<path class="prop" d="M88 316.7 V423.3"/>
+<rect class="outline" x="229.7" y="76.0" width="84.0" height="588.0"/>
+<path class="brk" d="M229.7 235.6 H313.7"/>
+<path class="brk" d="M229.7 504.4 H313.7"/>
+<path class="spar" d="M250.7 76.0 V664.0"/>
+<rect class="outline" x="488.0" y="286.0" width="63.0" height="168.0"/>
+<rect class="dot" x="492.2" y="368.5" width="58.8" height="3"/>
+<circle class="outline" cx="250.7" cy="370" r="10"/><path class="dot" d="M250.7 370 V360 A10 10 0 0 1 260.7 370 Z"/><path class="dot" d="M250.7 370 V380 A10 10 0 0 1 240.7 370 Z"/>
+
+<text class="sans s12 b ink" x="264.7" y="350">CG</text>
+
+<path class="ext" d="M229.7 76.0 H44 M229.7 664.0 H44"/>
+<path class="dim" d="M50 76.0 V664.0"/><path class="arrow" d="M50 76.0 l-3.5 7 h7 z"/><path class="arrow" d="M50 664.0 l-3.5 -7 h7 z"/>
+
+<text class="mono s13 ink" x="42" y="370" text-anchor="middle" transform="rotate(-90 42 370)">1400</text>
+
+<path class="ext" d="M229.7 76.0 V44 M313.7 76.0 V44"/>
+<path class="dim" d="M229.7 50 H313.7"/><path class="arrow" d="M229.7 50 l7 -3.5 v7 z"/><path class="arrow" d="M313.7 50 l-7 -3.5 v7 z"/>
+
+<text class="mono s13 ink" x="271.7" y="42" text-anchor="middle">200</text>
+
+<path class="ext" d="M313.7 76.0 H349.7 M313.7 235.6 H349.7"/>
+<path class="dim" d="M343.7 76.0 V235.6"/><path class="arrow" d="M343.7 76.0 l-3.5 7 h7 z"/><path class="arrow" d="M343.7 235.6 l-3.5 -7 h7 z"/>
+
+<text class="mono s13 ink" x="357.7" y="155.8" text-anchor="middle" transform="rotate(-90 357.7 155.8)">380</text>
+
+<path class="ext" d="M313.7 370 H349.7"/>
+<path class="dim" d="M343.7 235.6 V370"/><path class="arrow" d="M343.7 235.6 l-3.5 7 h7 z"/><path class="arrow" d="M343.7 370 l-3.5 -7 h7 z"/>
+
+<text class="mono s13 ink" x="357.7" y="302.8" text-anchor="middle" transform="rotate(-90 357.7 302.8)">320</text>
+
+<text class="sans s11 mute" x="221.7" y="229.6" text-anchor="end">polyhedral break</text>
+
+<text class="sans s11 mute" x="221.7" y="243.6" text-anchor="end">8°, 53 mm tip block</text>
+
+<text class="sans s11 warn" x="256.7" y="94.0" transform="rotate(90 256.7 94.0)">spar · 50 mm behind LE</text>
+
+<path class="ext" d="M110 386 V706 M551.0 370 V706 M229.7 664.0 V688"/>
+<path class="dim" d="M110 682 H229.7"/><path class="arrow" d="M110 682 l7 -3.5 v7 z"/><path class="arrow" d="M229.7 682 l-7 -3.5 v7 z"/>
+
+<text class="mono s12 ink" x="169.85" y="676" text-anchor="middle">285</text>
+
+<path class="dim" d="M110 700 H551.0"/><path class="arrow" d="M110 700 l7 -3.5 v7 z"/><path class="arrow" d="M551.0 700 l-7 -3.5 v7 z"/>
+
+<text class="mono s12 ink" x="330.5" y="718" text-anchor="middle">1050 · firewall to tail</text>
+
+<path class="ext" d="M488.0 286.0 V264 M551.0 286.0 V264"/>
+<path class="dim" d="M488.0 270 H551.0"/><path class="arrow" d="M488.0 270 l7 -3.5 v7 z"/><path class="arrow" d="M551.0 270 l-7 -3.5 v7 z"/>
+
+<text class="mono s12 ink" x="519.5" y="262" text-anchor="middle">150</text>
+
+<path class="ext" d="M551.0 286.0 H581 M551.0 454.0 H581"/>
+<path class="dim" d="M575 286.0 V454.0"/><path class="arrow" d="M575 286.0 l-3.5 7 h7 z"/><path class="arrow" d="M575 454.0 l-3.5 -7 h7 z"/>
+
+<text class="mono s12 ink" x="590" y="370" text-anchor="middle" transform="rotate(-90 590 370)">400</text>
+
+<text class="sans h1 ink" x="640" y="40">Airframe</text>
+
+<text class="sans s13 mute" x="640" y="62">design dimensions in mm · foam board, wooden spar</text>
+
+<text class="sans s12 b mute" x="640" y="98">SIDE VIEW</text>
+
+<path class="fill2" d="M680 190 H974.0 V177.4 L792.0 167.6 H680 Z"/>
+<path class="outline" d="M759.8 167.6 V162.0 H787.8 V164.79999999999998 H815.8 V167.6 Z"/>
+<rect class="outline" x="932.0" y="175.4" width="42.0" height="2"/>
+<path class="outline" d="M934.8 175.4 H974.0 V125.0 H946.0 Z"/>
+<rect class="box" x="666" y="172" width="14" height="14" rx="2"/>
+<path class="prop" d="M662 143.4 V214.6"/>
+<circle class="outline" cx="773.8" cy="178.8" r="7"/><path class="dot" d="M773.8 178.8 V171.8 A7 7 0 0 1 780.8 178.8 Z"/><path class="dot" d="M773.8 178.8 V185.8 A7 7 0 0 1 766.8 178.8 Z"/>
+
+<text class="sans s12 b ink" x="773.8" y="212" text-anchor="middle">CG</text>
+
+<text class="sans s11 mute" x="787.8" y="153.6" text-anchor="middle">high wing</text>
+
+<text class="sans s12 b mute" x="640" y="258">FRONT VIEW</text>
+
+<circle cx="820" cy="326.8" r="27.9" fill="none" class="ext"/>
+<path class="thin" d="M820 325.7 V286.1"/>
+<path class="thin" d="M776.0 325.7 H864.0"/>
+<rect class="fill2" x="811.8" y="318" width="16.5" height="17.6"/>
+<polyline fill="none" class="thin" style="stroke-width:5;stroke-linejoin:round" points="666.0,306.3 749.6,318 890.4,318 974.0,306.3"/>
+<text class="sans s12 mute" x="820" y="368" text-anchor="middle">8° polyhedral at ±320 · roll comes from rudder</text>
+
+<text class="sans s12 b mute" x="640" y="404">KEY NUMBERS</text>
+
+<text class="sans s13 ink" x="640" y="430">Wingspan</text>
+
+<text class="mono s13 ink" x="980" y="430" text-anchor="end">1400</text>
+
+<path class="rule" d="M640 438 H980"/>
+<text class="sans s13 ink" x="640" y="455">Chord</text>
+
+<text class="mono s13 ink" x="980" y="455" text-anchor="end">200, constant</text>
+
+<path class="rule" d="M640 463 H980"/>
+<text class="sans s13 ink" x="640" y="480">Wing area</text>
+
+<text class="mono s13 ink" x="980" y="480" text-anchor="end">28 dm²</text>
+
+<path class="rule" d="M640 488 H980"/>
+<text class="sans s13 ink" x="640" y="505">Airfoil</text>
+
+<text class="mono s13 ink" x="980" y="505" text-anchor="end">KFm-2, step 100 from LE</text>
+
+<path class="rule" d="M640 513 H980"/>
+<text class="sans s13 ink" x="640" y="530">Polyhedral</text>
+
+<text class="mono s13 ink" x="980" y="530" text-anchor="end">8° at ±320</text>
+
+<path class="rule" d="M640 538 H980"/>
+<text class="sans s13 ink" x="640" y="555">Fuselage</text>
+
+<text class="mono s13 ink" x="980" y="555" text-anchor="end">1050 × 75 × 80</text>
+
+<path class="rule" d="M640 563 H980"/>
+<text class="sans s13 ink" x="640" y="580">Horizontal stab</text>
+
+<text class="mono s13 ink" x="980" y="580" text-anchor="end">400 × 150</text>
+
+<path class="rule" d="M640 588 H980"/>
+<text class="sans s13 ink" x="640" y="605">Fin</text>
+
+<text class="mono s13 ink" x="980" y="605" text-anchor="end">180 high · 140 / 100 chord</text>
+
+<path class="rule" d="M640 613 H980"/>
+<text class="sans s13 ink" x="640" y="630">CG</text>
+
+<text class="mono s13 ink" x="980" y="630" text-anchor="end">50 behind LE (25 %)</text>
+
+<path class="rule" d="M640 638 H980"/>
+<text class="sans s13 ink" x="640" y="655">Motor · prop</text>
+
+<text class="mono s13 ink" x="980" y="655" text-anchor="end">A2212 1000 KV · 10×4.5</text>
+
+<path class="rule" d="M640 663 H980"/>
+<text class="sans s13 ink" x="640" y="680">AUW, estimated</text>
+
+<text class="mono s13 ink" x="980" y="680" text-anchor="end">≈ 976 g · 35 g/dm²</text>
+
+<path class="rule" d="M640 688 H980"/>
+<text class="sans s11 mute" x="640" y="718">From the build plan. Weigh and balance the real aircraft.</text>
+
+</svg>

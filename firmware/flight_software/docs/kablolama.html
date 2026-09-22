@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ESP32-D Uçak Kablolaması</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#eef1f4; --surface:#f9fbfc; --ink:#16202b; --muted:#5a6776; --rule:#d2d9e1; --accent:#2f5d8a;
+  --pcb:#1f2a37; --pcb-ink:#dbe3ec; --pcb-mute:#7d8b9a; --pcb-flash:#e0925a; --pad:#c49a3c; --metal:#b7c0ca; --metal-ink:#2a3441;
+  --rf:#17332b; --rf-ink:#cfe3d8; --casing:#2b3542; --warn:#a4560c; --warn-bg:#f8ecdc;
+  --w-red:#d93a2f; --w-black:#15181c; --w-blue:#2b63d9; --w-mag:#cc36ad; --w-orange:#ec8a1a; --w-cyan:#1fb6cc; --w-green:#2ea24c;
+  --w-yellow:#e2b21b; --w-purple:#8456d4; --w-white:#f3f3f1;
+  --sans:"Archivo", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0f151b; --surface:#161e27; --ink:#e2e8ee; --muted:#92a0af; --rule:#27323e; --accent:#86b0dc;
+    --pcb:#253344; --pcb-ink:#dbe3ec; --pcb-mute:#8290a0; --pcb-flash:#e8a06c; --pad:#c9a24a; --metal:#8e98a3; --metal-ink:#1a2129;
+    --rf:#1c3b32; --rf-ink:#cfe3d8; --casing:#b3bdc8; --warn:#e7a257; --warn-bg:#2a2117; --w-black:#0b0d10;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0f151b; --surface:#161e27; --ink:#e2e8ee; --muted:#92a0af; --rule:#27323e; --accent:#86b0dc;
+  --pcb:#253344; --pcb-ink:#dbe3ec; --pcb-mute:#8290a0; --pcb-flash:#e8a06c; --pad:#c9a24a; --metal:#8e98a3; --metal-ink:#1a2129;
+  --rf:#1c3b32; --rf-ink:#cfe3d8; --casing:#b3bdc8; --warn:#e7a257; --warn-bg:#2a2117; --w-black:#0b0d10;
+}
+
+*{box-sizing:border-box}
+body{background:var(--ground); color:var(--ink); font-family:var(--sans); font-size:15px; line-height:1.55;
+  padding-block:40px 64px; padding-inline:20px; margin:0}
+.wrap{max-width:1180px; margin:0 auto; display:grid; gap:36px}
+
+header{display:grid; gap:10px; max-width:72ch}
+.eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--muted)}
+h1{font-size:clamp(28px,4.2vw,40px); line-height:1.1; margin:0; font-weight:700; letter-spacing:-.01em; text-wrap:balance}
+.lead{margin:0; color:var(--muted); font-size:16px}
+.lead b{color:var(--ink); font-weight:600}
+code{font-family:var(--mono); font-size:.92em}
+.status{justify-self:start; font-size:13px; font-weight:600; color:var(--warn); background:var(--warn-bg); padding:5px 10px; border-radius:4px}
+
+figure{margin:0; background:var(--surface); border:1px solid var(--rule); border-radius:6px; display:grid}
+.scroll{overflow-x:auto; padding:18px 14px 6px}
+figure svg{display:block; width:100%; min-width:1000px; height:auto}
+figcaption{padding:12px 18px 16px; border-top:1px solid var(--rule); color:var(--muted); font-size:13.5px}
+
+/* SVG parcalari */
+.pcb{fill:var(--pcb)} .rfpcb{fill:var(--rf)} .metal{fill:var(--metal)} .pad{fill:var(--pad)}
+.ant{fill:none; stroke:var(--pad); stroke-width:2}
+.t{font-family:var(--mono); font-size:11px}
+.t-on{fill:var(--pcb-ink); font-weight:500} .t-off{fill:var(--pcb-mute)} .t-flash{fill:var(--pcb-flash)}
+.t-rf{fill:var(--rf-ink)} .t-metal{fill:var(--metal-ink); font-size:10px}
+.t-ink{fill:var(--ink)} .t-mute{fill:var(--muted)}
+.t-head{font-family:var(--sans); font-size:13px; font-weight:600; fill:var(--ink)}
+.t-box{font-family:var(--sans); font-size:13px; font-weight:600; fill:var(--ink)}
+.chip{fill:#0d1114}
+.leg{stroke:var(--metal); stroke-width:3; fill:none}
+.cap{fill:#2d4f8f} .capstripe{fill:#b9c7de} .t-cap{fill:#ffffff; font-family:var(--sans); font-size:13px; font-weight:700}
+.casing{fill:none; stroke:var(--casing); stroke-width:7; stroke-linecap:round; stroke-linejoin:round}
+.wire{fill:none; stroke-width:4; stroke-linecap:round; stroke-linejoin:round}
+.dash{stroke-dasharray:9 7; stroke-linecap:butt}
+.casing-p{fill:none; stroke:var(--casing); stroke-width:10; stroke-linecap:round; stroke-linejoin:round}
+.pwr{fill:none; stroke-width:7; stroke-linecap:round; stroke-linejoin:round}
+.box{fill:var(--surface); stroke:var(--ink); stroke-width:1.5}
+.res{fill:var(--surface); stroke:var(--ink); stroke-width:1.5}
+.plate{fill:none; stroke:var(--ink); stroke-width:3}
+.lead-thin{fill:none; stroke:var(--ink); stroke-width:2}
+.dot{fill:var(--ink)}
+.hdr{fill:var(--pcb)}
+
+section{display:grid; gap:14px}
+h2{font-size:19px; margin:0; font-weight:600; text-wrap:balance}
+.tbl{overflow-x:auto; border:1px solid var(--rule); border-radius:6px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:600px; font-variant-numeric:tabular-nums}
+th,td{text-align:left; padding:10px 14px; border-bottom:1px solid var(--rule); vertical-align:middle}
+tr:last-child td{border-bottom:0}
+th{font-size:11.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); font-weight:600}
+td.m{font-family:var(--mono); font-size:13.5px}
+td.dim{color:var(--muted)}
+.silk{font-family:var(--mono); font-size:12px; color:var(--muted); margin-left:6px}
+.sw{display:inline-flex; align-items:center; gap:8px}
+.sw i{width:26px; height:8px; border-radius:4px; box-shadow:0 0 0 1px var(--casing); display:inline-block}
+.tag{font-size:12px; font-weight:600; color:var(--warn)}
+.two{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,500px),1fr)); gap:28px; align-items:start}
+
+.notes{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); gap:14px}
+.note{border:1px solid var(--rule); border-radius:6px; padding:14px 16px; background:var(--surface); display:grid; gap:6px; align-content:start}
+.note.warn{background:var(--warn-bg); border-color:transparent}
+.note h3{margin:0; font-size:14.5px; font-weight:600}
+.note.warn h3{color:var(--warn)}
+.note p{margin:0; font-size:14px; color:var(--muted); max-width:62ch}
+.note.warn p{color:var(--ink)}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">flight_software · ESP32 DevKitC 38 pin (ESP-WROOM-32 / 32D) + nRF24L01 · 3 kanal: gaz, elevator, rudder</div>
+    <h1>ESP32-D Uçak Kablolaması</h1>
+    <p class="lead">Kart iki yarıya ayrılıyor: <b>sol pin sırası uçuş tarafı</b> (ESC, elevator, rudder, 5&nbsp;V besleme), <b>sağ pin sırası telsiz</b> (nRF24, kumandayla aynı GPIO'lar). Ayrı UBEC yok: <b>ESC'nin BEC çıkışı kartın 5V pinine gelir, servolar oradan beslenir</b>. Pinler kartta "D" öneki olmadan yazılır; "4" yazan pin GPIO4'tür.</p>
+    <div class="status">Firmware bu pinlerle derleniyor · flight_software/src/main.cpp · pervanesiz tezgah testinden önce uçurma</div>
+  </header>
+
+  <figure>
+    <div class="scroll">
+      <svg viewBox="0 0 1270 870" role="img" aria-label="38 pinli ESP32 DevKitC uçak kartı. Sol sıra: 25 ESC sinyali, sinyal ile GND arasında 10k; 26 elevator, 27 rudder servo rayına. ESC'nin BEC 5V çıkışı kartın 5V pinine ve servo rayına gider, BEC hattında 5V-GND arası kondansatör. LiPo yalnızca ESC'yi besler. Sağ sıra: nRF24L01, 23 MOSI, 19 MISO, 18 SCK, 5 CSN, 4 CE, GND; VCC sol üstteki 3V3'ten kartın altından gelir; VCC-GND arasında 10-100 mikrofarad kondansatör.">
+
+        <!-- ================= ESP32 DevKitC 38 pin ================= -->
+        <text class="t-head" x="420" y="26">ESP32 DevKitC · 38 pin · yazılar karttaki gibi</text>
+        <rect class="pcb" x="420" y="40" width="220" height="620" rx="8"/>
+        <rect class="pcb" x="486" y="48" width="88" height="48" rx="2"/>
+        <polyline class="ant" points="496,86 496,58 510,58 510,86 524,86 524,58 538,58 538,86 552,86 552,58 564,58"/>
+        <rect class="metal" x="488" y="98" width="84" height="150" rx="3"/>
+        <text class="t t-metal" x="530" y="190" text-anchor="middle">ESP-WROOM</text>
+        <text class="t t-metal" x="530" y="204" text-anchor="middle">-32D</text>
+        <rect class="metal" x="510" y="650" width="40" height="28" rx="3"/>
+        <text class="t t-mute" x="530" y="696" text-anchor="middle">USB</text>
+
+        <!-- sol sira -->
+        <g>
+          <circle class="pad" cx="440" cy="120" r="6"/><text class="t t-on"    x="454" y="124">3V3</text>
+          <circle class="pad" cx="440" cy="148" r="6"/><text class="t t-off"   x="454" y="152">EN</text>
+          <circle class="pad" cx="440" cy="176" r="6"/><text class="t t-off"   x="454" y="180">VP</text>
+          <circle class="pad" cx="440" cy="204" r="6"/><text class="t t-off"   x="454" y="208">VN</text>
+          <circle class="pad" cx="440" cy="232" r="6"/><text class="t t-off"   x="454" y="236">34</text>
+          <circle class="pad" cx="440" cy="260" r="6"/><text class="t t-off"   x="454" y="264">35</text>
+          <circle class="pad" cx="440" cy="288" r="6"/><text class="t t-off"   x="454" y="292">32</text>
+          <circle class="pad" cx="440" cy="316" r="6"/><text class="t t-off"   x="454" y="320">33</text>
+          <circle class="pad" cx="440" cy="344" r="6"/><text class="t t-on"    x="454" y="348">25</text>
+          <circle class="pad" cx="440" cy="372" r="6"/><text class="t t-on"    x="454" y="376">26</text>
+          <circle class="pad" cx="440" cy="400" r="6"/><text class="t t-on"    x="454" y="404">27</text>
+          <circle class="pad" cx="440" cy="428" r="6"/><text class="t t-off"   x="454" y="432">14</text>
+          <circle class="pad" cx="440" cy="456" r="6"/><text class="t t-off"   x="454" y="460">12</text>
+          <circle class="pad" cx="440" cy="484" r="6"/><text class="t t-on"    x="454" y="488">GND</text>
+          <circle class="pad" cx="440" cy="512" r="6"/><text class="t t-off"   x="454" y="516">13</text>
+          <circle class="pad" cx="440" cy="540" r="6"/><text class="t t-flash" x="454" y="544">D2 flash</text>
+          <circle class="pad" cx="440" cy="568" r="6"/><text class="t t-flash" x="454" y="572">D3 flash</text>
+          <circle class="pad" cx="440" cy="596" r="6"/><text class="t t-flash" x="454" y="600">CMD flash</text>
+          <circle class="pad" cx="440" cy="624" r="6"/><text class="t t-on"    x="454" y="628">5V</text>
+        </g>
+        <!-- sag sira -->
+        <g>
+          <circle class="pad" cx="620" cy="120" r="6"/><text class="t t-off"   x="606" y="124" text-anchor="end">GND</text>
+          <circle class="pad" cx="620" cy="148" r="6"/><text class="t t-on"    x="606" y="152" text-anchor="end">23</text>
+          <circle class="pad" cx="620" cy="176" r="6"/><text class="t t-off"   x="606" y="180" text-anchor="end">22</text>
+          <circle class="pad" cx="620" cy="204" r="6"/><text class="t t-off"   x="606" y="208" text-anchor="end">TX</text>
+          <circle class="pad" cx="620" cy="232" r="6"/><text class="t t-off"   x="606" y="236" text-anchor="end">RX</text>
+          <circle class="pad" cx="620" cy="260" r="6"/><text class="t t-off"   x="606" y="264" text-anchor="end">21</text>
+          <circle class="pad" cx="620" cy="288" r="6"/><text class="t t-on"    x="606" y="292" text-anchor="end">GND</text>
+          <circle class="pad" cx="620" cy="316" r="6"/><text class="t t-on"    x="606" y="320" text-anchor="end">19</text>
+          <circle class="pad" cx="620" cy="344" r="6"/><text class="t t-on"    x="606" y="348" text-anchor="end">18</text>
+          <circle class="pad" cx="620" cy="372" r="6"/><text class="t t-on"    x="606" y="376" text-anchor="end">5</text>
+          <circle class="pad" cx="620" cy="400" r="6"/><text class="t t-off"   x="606" y="404" text-anchor="end">17</text>
+          <circle class="pad" cx="620" cy="428" r="6"/><text class="t t-off"   x="606" y="432" text-anchor="end">16</text>
+          <circle class="pad" cx="620" cy="456" r="6"/><text class="t t-on"    x="606" y="460" text-anchor="end">4</text>
+          <circle class="pad" cx="620" cy="484" r="6"/><text class="t t-off"   x="606" y="488" text-anchor="end">0</text>
+          <circle class="pad" cx="620" cy="512" r="6"/><text class="t t-off"   x="606" y="516" text-anchor="end">2</text>
+          <circle class="pad" cx="620" cy="540" r="6"/><text class="t t-off"   x="606" y="544" text-anchor="end">15</text>
+          <circle class="pad" cx="620" cy="568" r="6"/><text class="t t-flash" x="606" y="572" text-anchor="end">flash D1</text>
+          <circle class="pad" cx="620" cy="596" r="6"/><text class="t t-flash" x="606" y="600" text-anchor="end">flash D0</text>
+          <circle class="pad" cx="620" cy="624" r="6"/><text class="t t-flash" x="606" y="628" text-anchor="end">flash CLK</text>
+        </g>
+
+        <!-- ================= SOL: servo rayi, ESC, besleme ================= -->
+        <text class="t-head" x="264" y="314">Servo rayı</text>
+        <text class="t t-mute" x="338" y="314">− + S</text>
+        <rect class="hdr" x="264" y="358" width="92" height="56" rx="4"/>
+
+        <!-- raylar: - GND hattina, + 5V hattina iner -->
+        <path class="casing-p" d="M280 372 V484"/>
+        <path class="pwr" style="stroke:var(--w-black)" d="M280 372 V484"/>
+        <path class="casing-p" d="M310 372 V624"/>
+        <path class="pwr" style="stroke:var(--w-red)" d="M310 372 V624"/>
+
+        <!-- 5V: kartin 5V pini <-> ray + <-> ESC BEC -->
+        <path class="casing" d="M440 624 H200 V700"/>
+        <path class="wire" style="stroke:var(--w-red)" d="M440 624 H200 V700"/>
+        <!-- GND: kartin GND pini <-> ray - <-> ESC (+ rayinin ustunden gecer) -->
+        <path class="casing" d="M440 484 H160 V700"/>
+        <path class="wire" style="stroke:var(--w-black)" d="M440 484 H160 V700"/>
+
+        <g>
+          <circle class="pad" cx="280" cy="372" r="6"/><circle class="pad" cx="310" cy="372" r="6"/><circle class="pad" cx="340" cy="372" r="6"/>
+          <circle class="pad" cx="280" cy="400" r="6"/><circle class="pad" cx="310" cy="400" r="6"/><circle class="pad" cx="340" cy="400" r="6"/>
+        </g>
+
+        <!-- servo sinyalleri -->
+        <path class="casing" d="M440 372 H340"/><path class="wire" style="stroke:var(--w-yellow)" d="M440 372 H340"/>
+        <path class="casing" d="M440 400 H340"/><path class="wire" style="stroke:var(--w-purple)" d="M440 400 H340"/>
+        <!-- ESC sinyali: 25 -> ESC -->
+        <path class="casing" d="M440 344 H120 V700"/>
+        <path class="wire" style="stroke:var(--w-white)" d="M440 344 H120 V700"/>
+
+        <text class="t t-ink" x="360" y="337">ESC</text>
+        <text class="t t-ink" x="360" y="365">ELEV</text>
+        <text class="t t-ink" x="360" y="393">RUDDER</text>
+        <text class="t t-mute" x="318" y="540">+5V</text>
+        <text class="t t-mute" x="272" y="452" text-anchor="end">GND</text>
+        <text class="t t-mute" x="334" y="476">GND</text>
+        <text class="t t-mute" x="334" y="616">5V</text>
+
+        <!-- 10k: ESC sinyali ile GND arasi -->
+        <path class="lead-thin" d="M220 344 V390 M220 440 V484"/>
+        <rect class="res" x="213" y="390" width="14" height="50" rx="2"/>
+        <text class="t t-ink" x="234" y="419">10k</text>
+
+        <!-- kondansator: ESC BEC hatti, 5V-GND arasi -->
+        <path class="lead-thin" d="M160 660 H176 M184 660 H200"/>
+        <path class="plate" d="M176 647 V673 M184 647 V673"/>
+        <text class="t t-ink" x="192" y="643" text-anchor="middle">+</text>
+        <text class="t t-ink" x="212" y="664">kondansatör</text>
+        <text class="t t-mute" x="212" y="679">BEC hattı</text>
+
+        <circle class="dot" cx="220" cy="344" r="4"/>
+        <circle class="dot" cx="220" cy="484" r="4"/>
+        <circle class="dot" cx="280" cy="484" r="4.5"/>
+        <circle class="dot" cx="310" cy="624" r="4.5"/>
+        <circle class="dot" cx="160" cy="660" r="4"/>
+        <circle class="dot" cx="200" cy="660" r="4"/>
+
+        <text class="t t-mute" x="112" y="560" text-anchor="end">sinyal</text>
+        <text class="t t-mute" x="152" y="600" text-anchor="end">GND</text>
+        <text class="t t-mute" x="208" y="696">BEC 5V</text>
+
+        <!-- ESC + motor -->
+        <rect class="box" x="90" y="700" width="140" height="70" rx="4"/>
+        <text class="t-box" x="160" y="740" text-anchor="middle">ESC</text>
+        <path class="lead-thin" d="M90 722 H66 M90 735 H66 M90 748 H66"/>
+        <circle class="box" cx="45" cy="735" r="20"/>
+        <text class="t-box" x="45" y="740" text-anchor="middle">M</text>
+        <text class="t t-mute" x="45" y="772" text-anchor="middle">motor</text>
+
+        <!-- LiPo: yalnizca ESC -->
+        <path class="casing-p" d="M130 770 V806"/>
+        <path class="pwr" style="stroke:var(--w-red)" d="M130 770 V806"/>
+        <path class="casing-p" d="M190 770 V806"/>
+        <path class="pwr" style="stroke:var(--w-black)" d="M190 770 V806"/>
+        <rect class="box" x="90" y="806" width="140" height="50" rx="4"/>
+        <text class="t-box" x="160" y="836" text-anchor="middle">LiPo</text>
+
+        <!-- ================= SAG: nRF24L01 ================= -->
+        <rect class="rfpcb" x="972" y="190" width="278" height="180" rx="6"/>
+        <rect class="chip" x="1168" y="260" width="40" height="40" rx="2"/>
+        <polyline class="ant" points="1224,202 1240,202 1240,224 1224,224 1224,246 1240,246 1240,268 1224,268 1224,290 1240,290 1240,312 1224,312 1224,334 1240,334 1240,356"/>
+        <text class="t t-rf" x="1062" y="230">1 GND</text><text class="t t-rf" x="1116" y="230">2 VCC</text>
+        <text class="t t-rf" x="1062" y="266">3 CE</text><text class="t t-rf" x="1116" y="266">4 CSN</text>
+        <text class="t t-rf" x="1062" y="302">5 SCK</text><text class="t t-rf" x="1116" y="302">6 MOSI</text>
+        <text class="t t-rf" x="1062" y="338">7 MISO</text><text class="t t-rf" x="1116" y="338" style="opacity:.6">8 IRQ</text>
+        <text class="t-head" x="972" y="394">nRF24L01</text>
+        <text class="t t-mute" x="972" y="410">2×4 konnektör · kare pad = 1. bacak</text>
+
+        <path class="leg" d="M1000 226 V188"/>
+        <path class="leg" d="M1040 226 V188"/>
+        <rect class="cap" x="984" y="150" width="72" height="38" rx="9"/>
+        <path class="capstripe" d="M993 150 H1004 V188 H993 A9 9 0 0 1 984 179 V159 A9 9 0 0 1 993 150 Z"/>
+        <text class="t-cap" x="994" y="174" text-anchor="middle" style="fill:#1b2a44">−</text>
+        <text class="t-cap" x="1040" y="174" text-anchor="middle">+</text>
+        <text class="t t-ink" x="1068" y="166">10–100 µF</text>
+        <text class="t t-mute" x="1068" y="182">pinlere en yakın</text>
+        <text class="t t-mute" x="984" y="140">− GND · + VCC</text>
+
+        <g>
+          <path class="casing dash" d="M440 120 V134 H640"/>
+          <path class="wire dash" style="stroke:var(--w-red)" d="M440 120 V134 H640"/>
+          <path class="casing" d="M640 134 H720 V208 H1040 V226"/>
+          <path class="wire" style="stroke:var(--w-red)" d="M640 134 H720 V208 H1040 V226"/>
+          <path class="casing" d="M620 148 H680 V280 H1040 V298"/>
+          <path class="wire" style="stroke:var(--w-cyan)" d="M620 148 H680 V280 H1040 V298"/>
+          <path class="casing" d="M620 288 H760 V226 H1000"/>
+          <path class="wire" style="stroke:var(--w-black)" d="M620 288 H760 V226 H1000"/>
+          <path class="casing" d="M620 316 H800 V334 H1000"/>
+          <path class="wire" style="stroke:var(--w-green)" d="M620 316 H800 V334 H1000"/>
+          <path class="casing" d="M620 344 H840 V298 H1000"/>
+          <path class="wire" style="stroke:var(--w-orange)" d="M620 344 H840 V298 H1000"/>
+          <path class="casing" d="M620 372 H880 V244 H1040 V262"/>
+          <path class="wire" style="stroke:var(--w-mag)" d="M620 372 H880 V244 H1040 V262"/>
+          <path class="casing" d="M620 456 H920 V262 H1000"/>
+          <path class="wire" style="stroke:var(--w-blue)" d="M620 456 H920 V262 H1000"/>
+        </g>
+
+        <rect   class="pad" x="993" y="219" width="14" height="14"/><circle class="pad" cx="1040" cy="226" r="7"/>
+        <circle class="pad" cx="1000" cy="262" r="7"/><circle class="pad" cx="1040" cy="262" r="7"/>
+        <circle class="pad" cx="1000" cy="298" r="7"/><circle class="pad" cx="1040" cy="298" r="7"/>
+        <circle class="pad" cx="1000" cy="334" r="7"/><circle class="pad" cx="1040" cy="334" r="7" style="opacity:.55"/>
+
+        <text class="t t-ink" x="646" y="127">VCC ← 3V3</text>
+        <text class="t t-ink" x="630" y="166">MOSI</text>
+        <text class="t t-ink" x="646" y="281">GND</text>
+        <text class="t t-ink" x="646" y="309">MISO</text>
+        <text class="t t-ink" x="646" y="337">SCK</text>
+        <text class="t t-ink" x="646" y="365">CSN</text>
+        <text class="t t-ink" x="646" y="449">CE</text>
+      </svg>
+    </div>
+    <figcaption>Pin yazıları senin kartındaki gibi (38 pinli DevKitC, anten yukarıda, bileşen tarafı). Kesik kırmızı çizgi kartın altından geçen kabloyu gösterir; perfboard'da kartın arka tarafından geçir, antenin üstünden geçirme. Servo rayında sıra her satırda − / + / S. ESC kablosunun üç teli ayrı çizildi: beyaz sinyal 25'e, kırmızı BEC 5V kartın 5V hattına, siyah GND'ye. Kablo renkleri öneri. nRF24 konnektörünün yönünü gerçek modülde kare pad ve arkadaki baskıyla doğrula.</figcaption>
+  </figure>
+
+  <div class="two">
+    <section>
+      <h2>Çıkışlar ve besleme</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>İşlev</th><th>GPIO <span class="silk">kart yazısı</span></th><th>Kablo</th><th>Not</th></tr></thead>
+          <tbody>
+            <tr><td>ESC sinyal</td><td class="m">GPIO25 <span class="silk">25</span></td><td><span class="sw"><i style="background:var(--w-white)"></i>beyaz</span></td><td><span class="tag">10k → GND</span></td></tr>
+            <tr><td>Elevator</td><td class="m">GPIO26 <span class="silk">26</span></td><td><span class="sw"><i style="background:var(--w-yellow)"></i>sarı</span></td><td class="dim">Servo rayı</td></tr>
+            <tr><td>Rudder</td><td class="m">GPIO27 <span class="silk">27</span></td><td><span class="sw"><i style="background:var(--w-purple)"></i>mor</span></td><td class="dim">Servo rayı</td></tr>
+            <tr><td>Kart + servo beslemesi</td><td class="m">5V <span class="silk">sol alt</span></td><td><span class="sw"><i style="background:var(--w-red)"></i>kırmızı</span></td><td class="dim">ESC BEC çıkışından, hatta kondansatör</td></tr>
+            <tr><td>Ortak toprak</td><td class="m">GND <span class="silk">sol</span></td><td><span class="sw"><i style="background:var(--w-black)"></i>siyah</span></td><td class="dim">Ray, ESC, kondansatör</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>nRF24L01</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Bacak</th><th>Sinyal</th><th>GPIO <span class="silk">kart yazısı</span></th><th>Kablo</th></tr></thead>
+          <tbody>
+            <tr><td class="m">1</td><td class="m">GND</td><td class="m">GND <span class="silk">sağ, 19'un üstü</span></td><td><span class="sw"><i style="background:var(--w-black)"></i>siyah</span></td></tr>
+            <tr><td class="m">2</td><td class="m">VCC</td><td class="m">3V3 <span class="silk">sol üst</span> <span class="tag">5V DEĞİL</span></td><td><span class="sw"><i style="background:var(--w-red)"></i>kırmızı</span></td></tr>
+            <tr><td class="m">3</td><td class="m">CE</td><td class="m">GPIO4 <span class="silk">4</span></td><td><span class="sw"><i style="background:var(--w-blue)"></i>mavi</span></td></tr>
+            <tr><td class="m">4</td><td class="m">CSN</td><td class="m">GPIO5 <span class="silk">5</span></td><td><span class="sw"><i style="background:var(--w-mag)"></i>magenta</span></td></tr>
+            <tr><td class="m">5</td><td class="m">SCK</td><td class="m">GPIO18 <span class="silk">18</span></td><td><span class="sw"><i style="background:var(--w-orange)"></i>turuncu</span></td></tr>
+            <tr><td class="m">6</td><td class="m">MOSI</td><td class="m">GPIO23 <span class="silk">23</span></td><td><span class="sw"><i style="background:var(--w-cyan)"></i>camgöbeği</span></td></tr>
+            <tr><td class="m">7</td><td class="m">MISO</td><td class="m">GPIO19 <span class="silk">19</span></td><td><span class="sw"><i style="background:var(--w-green)"></i>yeşil</span></td></tr>
+            <tr><td class="m">8</td><td class="m">IRQ</td><td class="dim">—</td><td class="dim">bağlı değil</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <section>
+    <h2>Uçağı yere indiren hatalar</h2>
+    <div class="notes">
+      <div class="note warn">
+        <h3>"D2" yazan pin GPIO2 değil</h3>
+        <p>Bu kartta <code>D0, D1, D2, D3, CMD, CLK</code> modülün dahili flash hattıdır (GPIO6–11). Bunlara bir şey bağlanırsa kart açılmaz ya da rastgele çöker. GPIO2 sağ sırada yalnızca <code>2</code> diye yazar.</p>
+      </div>
+      <div class="note warn">
+        <h3>0 yazan pine direnç koyma</h3>
+        <p>C3'teki "ESC GPIO0 + 10k pulldown" düzeni bu kartta her açılışta yükleme moduna sokar; uçak hiç açılmaz. ESC 25'te, 10k direnç o hatla GND arasında.</p>
+      </div>
+      <div class="note warn">
+        <h3>BEC hattındaki kondansatör şart</h3>
+        <p>ESC'nin BEC'i kartı ve iki servoyu birlikte besliyor. Servo ani hareket ettiğinde hat çöker, kondansatör bunu karşılıyor. Seri logda <code>BROWNOUT</code> görürsen önce kondansatörü ve GND'yi kontrol et; sürerse servoları ayrı UBEC'e al.</p>
+      </div>
+      <div class="note warn">
+        <h3>3V3 sol üstte, 5V sol altta</h3>
+        <p>nRF24 yalnızca <code>3V3</code>'e bağlanır. BEC hattı <code>5V</code>'a gider. İkisi aynı sırada ama zıt uçlarda; nRF24'ü 5V'a bağlamak modülü yakar.</p>
+      </div>
+      <div class="note">
+        <h3>Uzak durulacak diğer pinler</h3>
+        <p><code>0, 2, 12, 15</code> açılış modunu belirler, <code>14</code> açılışta PWM çıkarır, <code>TX / RX</code> USB seriye bağlı. <code>32 / 33</code> firmware'de aileron için ayrılmış, bu uçakta boş. Batarya ölçümü eklersen ADC1 pini (ör. <code>35</code>) kullan.</p>
+      </div>
+      <div class="note">
+        <h3>USB ve BEC aynı anda</h3>
+        <p>Kartın USB 5 V hattında diyot yoksa BEC bilgisayarın USB portuna geri besler. Yükleme yaparken LiPo'yu çıkar. Pin taraması (<code>t</code> / <code>p</code>) sırasında ESC, servolar ve nRF24 ayrı olmalı.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+</html>
