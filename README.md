@@ -1,7 +1,7 @@
 # ESP32 RC Plane
 
 <p align="center">
-  <img src="airframe/plane.jpeg" width="600" alt="The finished aircraft: white foam-board high-wing trainer with a green propeller, polyhedral wing and conventional tail">
+  <img src="airframe/plane.jpeg" width="600" alt="The finished aircraft: white foam-board high-wing trainer with a green propeller, dihedral wing and conventional tail">
 </p>
 
 A from-scratch radio control system for a fixed-wing aircraft, built on two ESP32 boards
@@ -11,13 +11,19 @@ surfaces and reports back — over a **redundant dual radio link** with failsafe
 both ends. The airframe is scratch-built too: a 1.4 m foam-board trainer cut by hand from
 a paper plan.
 
-The interesting part of this build is not that it moves a servo. It is everything that
+I started this because a transmitter and receiver set costs about 5000 TL, and I wanted to
+see whether I could do the radio link myself with two ESP32 boards I already had, using my
+phone as the sticks. That choice decides the rest of the project: if the ground station is
+the transmitter, then arming, failsafe and throttle limits are my problem, not a radio
+manufacturer's.
+
+So the interesting part of this build is not that it moves a servo. It is everything that
 happens when the link degrades: duplicate suppression, arm interlocks, relink hysteresis
 and independent throttle ceilings on both sides.
 
 <p align="center">
-  <img src="airframe/first_flight.gif" width="400" alt="Hand launch on a ploughed field: the aircraft leaves the hand under power and climbs away">
-  <br><sub>First field test, 21 September 2026 — hand launch and about ten seconds of flight.</sub>
+  <img src="airframe/first_flight.webp" width="480" alt="Hand launch on a ploughed field: the aircraft leaves the hand under power, climbs away and flies across the field">
+  <br><sub>First field test, 21 September 2026 — hand launch and the first seconds of the flight.</sub>
 </p>
 
 ## 🛰️ System Overview
@@ -43,7 +49,7 @@ internet, no pairing app. The ground station turns that into a 12-byte `RcPacket
 50 Hz and pushes it over the air.
 
 The airframe is a **3-channel trainer**: throttle, elevator and rudder. There are no
-ailerons — roll comes from rudder via wing polyhedral, which is why the spare stick axis is
+ailerons — roll comes from rudder via wing dihedral, which is why the spare stick axis is
 drawn as a single-axis slot in the UI rather than being silently dead. The protocol already
 carries a fourth channel: switch Settings to **4 channel** and both sticks become full
 gimbals, and the aircraft drives mirrored aileron servos on GPIO 32/33 — a new wing needs
@@ -107,24 +113,39 @@ limits alone means a corrupted packet or a stale browser tab can spin a propelle
 
 | | |
 |---|---|
-| **Construction** | Foam board (*fotoblok*) with a wooden spar, KFm-2 stepped airfoil, tape hinges |
-| **Wing** | 1400 mm span, 200 mm constant chord, 28 dm², high wing |
-| **Roll stability** | 8° polyhedral breaks at ±320 mm — roll comes from rudder |
-| **Tail** | 400 × 150 mm stabiliser, 180 mm fin |
-| **CG** | 50 mm behind the leading edge, on the spar line (25 % chord) |
-| **Power** | A2212 1000 KV outrunner, 10×4.5 prop, 3S 2200 mAh LiPo |
-| **Weight** | ≈ 976 g estimated, 35 g/dm² wing loading |
+| **Construction** | 5 mm foam board, wooden spar, KFm-2 stepped airfoil, tape hinges |
+| **Wing** | 1400 mm span, 200 mm constant chord, 28 dm², high wing on rubber bands |
+| **Roll stability** | 10° dihedral, one break at the centre — roll comes from rudder |
+| **Tail** | 400 × 150 mm stabiliser (Vh 0.70), 180 mm fin (Vv 0.036) |
+| **CG** | 280 mm from the firewall: 50 mm behind the leading edge, on the spar line |
+| **Power** | A2212 1000 KV, 10×4.5 prop, 30 A ESC, 3S 2200 mAh 30C |
+| **Weight** | 1105 g ready to fly, 39.5 g/dm² wing loading, thrust/weight ≈ 0.8 |
 
-The full build plan — cut list, sheet nesting for 50 × 70 cm foam board, spar layout,
-weight budget and build order — is in **[docs/AIRFRAME.md](docs/AIRFRAME.md)** (Turkish).
-These are design values; the finished aircraft has not been weighed into the table yet.
+Two details that keep breaking things cheap: the wing is held on by **two dowels and rubber
+bands**, so a hard landing pops it off instead of tearing the fuselage, and there is **no
+landing gear** — hand launch, belly landing, with a sacrificial strip taped under the nose.
+
+Every mechanical decision, and how the built aircraft differs from the original plan, is in
+**[docs/AIRFRAME.md](docs/AIRFRAME.md)** (Turkish).
 
 ## ⚡ Hardware
 
-<p align="center">
-  <img src="avionics/flight_circuit.jpeg" width="420" alt="Electronics bay inside the fuselage: ESP32 DevKitC on a breadboard, nRF24 module wrapped in tape with its capacitor, wiring to the servos">
-  <img src="avionics/ground_station_gateway_circuit.jpeg" width="420" alt="Ground station: ESP32-WROOM-32 with nRF24L01+ PA/LNA and 18650 pack">
-</p>
+Two boards, two jobs.
+
+<table>
+<tr>
+<td width="50%"><img src="avionics/flight_circuit.jpeg" alt="Electronics bay inside the fuselage: ESP32 DevKitC on a breadboard, nRF24 module wrapped in tape with its capacitor, wiring running to the servos"></td>
+<td width="50%"><img src="avionics/ground_station_gateway_circuit.jpeg" alt="Ground station opened up: ESP32-WROOM-32, nRF24L01+ PA/LNA with an SMA antenna, battery pack with a switch, next to its 3D-printed housing"></td>
+</tr>
+<tr>
+<td><b>1 · Aircraft</b> — inside the fuselage. Listens on both radios, validates every frame,
+runs it through the stored calibration curve and drives the ESC and two servos. Holds the
+failsafe, the arm lock and its own throttle ceiling, and sends telemetry back.</td>
+<td><b>2 · Ground station</b> — in your hand. Raises the WiFi access point, serves the flight
+interface to the phone, turns stick positions into a 12-byte frame 50 times a second and
+reads telemetry back. This board <i>is</i> the transmitter.</td>
+</tr>
+</table>
 
 **Aircraft — ESP32 DevKitC (38-pin, WROOM-32D).** The first bench prototype ran on an
 ESP32-C3 SuperMini; the aircraft that flies carries a classic ESP32. Both ends now share
@@ -139,12 +160,12 @@ If a module resets under load, check its capacitor and supply before suspecting 
 else — the firmware counts every recovery (`kurt=N` / `kurtarma=N`) so a brown-out cannot
 hide.
 
-**Power.** 3S 2200 mAh LiPo → ESC → A2212 1000 KV outrunner. There is no separate UBEC: the
-ESC's BEC output feeds the board's 5 V pin and both servos, with a bulk capacitor across
-that line. A 9 g servo pulls ~700 mA on a step input, so if the boot log ever shows
-`BROWNOUT`, check that capacitor and the ground first — and give the servos their own UBEC
-if it persists. Grounds are common. The ground station runs off an 18650 pack in a
-3D-printed enclosure.
+**Power.** 3S 2200 mAh 30C LiPo → 30 A ESC → A2212 1000 KV outrunner, under 25 A at full
+throttle. The ESC's linear BEC is disabled: the board and both servos run from a **separate
+5 V / 3 A UBEC** on the same battery, with a bulk capacitor across the rail. A 9 g servo
+pulls ~700 mA on a step input, and a linear BEC dropping 12 V to 5 V does it as heat — that
+is why it is not carrying the flight controller. Grounds are common. The ground station runs
+off an 18650 pack in a 3D-printed enclosure.
 
 > ⚠️ **The nRF24 needs a 10–100 µF capacitor across VCC–GND, as close to the module pins as
 > possible.** Without it the module browns out during transmit and `radio.begin()` succeeds
@@ -397,10 +418,13 @@ The link, the web UI, failsafe and the full actuation chain are installed in the
 First field tests took place on **21 September 2026**: hand launches from a ploughed field,
 the best of them about ten seconds in the air (clip at the top). Open items:
 
-* **Trim and CG** — tune from the first flights; weigh the finished aircraft and replace the
-  estimates in `docs/AIRFRAME.md` with measured values.
+* **Trim and CG** — tune from the first flights. The aircraft is weighed (1105 g) but the
+  balance point has not been re-measured since the wing moved forward to 230 mm.
 * **Soldered board** — the electronics still sit on a breadboard inside the fuselage.
 * **Battery telemetry** — `bataryaOku()` returns 0 today; the ground station's voltage field
   lights up as soon as a divider is wired to an ADC1 pin.
 * **Physical sticks** — a gimbal-based transmitter to replace the browser UI as primary control.
 * **Range testing** and PA level tuning under real separation.
+
+The longer plan — link authentication, range characterisation, flight logging, an IMU and
+stabilisation — is in **[docs/ROADMAP.md](docs/ROADMAP.md)** (Turkish).

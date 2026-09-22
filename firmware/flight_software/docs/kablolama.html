@@ -100,13 +100,13 @@ td.dim{color:var(--muted)}
   <header>
     <div class="eyebrow">flight_software · ESP32 DevKitC 38 pin (ESP-WROOM-32 / 32D) + nRF24L01 · 3 kanal: gaz, elevator, rudder</div>
     <h1>ESP32-D Uçak Kablolaması</h1>
-    <p class="lead">Kart iki yarıya ayrılıyor: <b>sol pin sırası uçuş tarafı</b> (ESC, elevator, rudder, 5&nbsp;V besleme), <b>sağ pin sırası telsiz</b> (nRF24, kumandayla aynı GPIO'lar). Ayrı UBEC yok: <b>ESC'nin BEC çıkışı kartın 5V pinine gelir, servolar oradan beslenir</b>. Pinler kartta "D" öneki olmadan yazılır; "4" yazan pin GPIO4'tür.</p>
+    <p class="lead">Kart iki yarıya ayrılıyor: <b>sol pin sırası uçuş tarafı</b> (ESC, elevator, rudder, 5&nbsp;V besleme), <b>sağ pin sırası telsiz</b> (nRF24, kumandayla aynı GPIO'lar). Besleme ayrı: <b>5&nbsp;V / 3&nbsp;A UBEC'in çıkışı kartın 5V pinine gelir, servolar oradan beslenir</b>; ESC'nin lineer BEC'i devre dışı. Pinler kartta "D" öneki olmadan yazılır; "4" yazan pin GPIO4'tür.</p>
     <div class="status">Firmware bu pinlerle derleniyor · flight_software/src/main.cpp · pervanesiz tezgah testinden önce uçurma</div>
   </header>
 
   <figure>
     <div class="scroll">
-      <svg viewBox="0 0 1270 870" role="img" aria-label="38 pinli ESP32 DevKitC uçak kartı. Sol sıra: 25 ESC sinyali, sinyal ile GND arasında 10k; 26 elevator, 27 rudder servo rayına. ESC'nin BEC 5V çıkışı kartın 5V pinine ve servo rayına gider, BEC hattında 5V-GND arası kondansatör. LiPo yalnızca ESC'yi besler. Sağ sıra: nRF24L01, 23 MOSI, 19 MISO, 18 SCK, 5 CSN, 4 CE, GND; VCC sol üstteki 3V3'ten kartın altından gelir; VCC-GND arasında 10-100 mikrofarad kondansatör.">
+      <svg viewBox="0 0 1270 870" role="img" aria-label="38 pinli ESP32 DevKitC uçak kartı. Sol sıra: 25 ESC sinyali, sinyal ile GND arasında 10k; 26 elevator, 27 rudder servo rayına. Ayri bir UBEC'in 5V cikisi kartin 5V pinine ve servo rayina gider, 5V hattinda 5V-GND arasi kondansator. LiPo hem ESC'yi hem UBEC'i besler; ESC'nin BEC'i kapali. Sağ sıra: nRF24L01, 23 MOSI, 19 MISO, 18 SCK, 5 CSN, 4 CE, GND; VCC sol üstteki 3V3'ten kartın altından gelir; VCC-GND arasında 10-100 mikrofarad kondansatör.">
 
         <!-- ================= ESP32 DevKitC 38 pin ================= -->
         <text class="t-head" x="420" y="26">ESP32 DevKitC · 38 pin · yazılar karttaki gibi</text>
@@ -175,9 +175,9 @@ td.dim{color:var(--muted)}
         <path class="casing-p" d="M310 372 V624"/>
         <path class="pwr" style="stroke:var(--w-red)" d="M310 372 V624"/>
 
-        <!-- 5V: kartin 5V pini <-> ray + <-> ESC BEC -->
-        <path class="casing" d="M440 624 H200 V700"/>
-        <path class="wire" style="stroke:var(--w-red)" d="M440 624 H200 V700"/>
+        <!-- 5V: kartin 5V pini <-> ray + <-> UBEC cikisi -->
+        <path class="casing" d="M440 624 H290 V700"/>
+        <path class="wire" style="stroke:var(--w-red)" d="M440 624 H290 V700"/>
         <!-- GND: kartin GND pini <-> ray - <-> ESC (+ rayinin ustunden gecer) -->
         <path class="casing" d="M440 484 H160 V700"/>
         <path class="wire" style="stroke:var(--w-black)" d="M440 484 H160 V700"/>
@@ -207,27 +207,28 @@ td.dim{color:var(--muted)}
         <rect class="res" x="213" y="390" width="14" height="50" rx="2"/>
         <text class="t t-ink" x="234" y="419">10k</text>
 
-        <!-- kondansator: ESC BEC hatti, 5V-GND arasi -->
-        <path class="lead-thin" d="M160 660 H176 M184 660 H200"/>
-        <path class="plate" d="M176 647 V673 M184 647 V673"/>
-        <text class="t t-ink" x="192" y="643" text-anchor="middle">+</text>
-        <text class="t t-ink" x="212" y="664">kondansatör</text>
-        <text class="t t-mute" x="212" y="679">BEC hattı</text>
+        <!-- kondansator: 5V hatti (UBEC cikisi), 5V-GND arasi -->
+        <path class="lead-thin" d="M160 660 H240 M248 660 H290"/>
+        <path class="plate" d="M240 647 V673 M248 647 V673"/>
+        <text class="t t-ink" x="256" y="643" text-anchor="middle">+</text>
+        <text class="t t-ink" x="300" y="656">kondansatör</text>
+        <text class="t t-mute" x="300" y="671">5V hattı</text>
 
         <circle class="dot" cx="220" cy="344" r="4"/>
         <circle class="dot" cx="220" cy="484" r="4"/>
         <circle class="dot" cx="280" cy="484" r="4.5"/>
         <circle class="dot" cx="310" cy="624" r="4.5"/>
         <circle class="dot" cx="160" cy="660" r="4"/>
-        <circle class="dot" cx="200" cy="660" r="4"/>
+        <circle class="dot" cx="290" cy="660" r="4"/>
 
         <text class="t t-mute" x="112" y="560" text-anchor="end">sinyal</text>
         <text class="t t-mute" x="152" y="600" text-anchor="end">GND</text>
-        <text class="t t-mute" x="208" y="696">BEC 5V</text>
+        <text class="t t-mute" x="300" y="694">UBEC 5V</text>
 
         <!-- ESC + motor -->
         <rect class="box" x="90" y="700" width="140" height="70" rx="4"/>
-        <text class="t-box" x="160" y="740" text-anchor="middle">ESC</text>
+        <text class="t-box" x="160" y="734" text-anchor="middle">ESC</text>
+        <text class="t t-mute" x="160" y="752" text-anchor="middle">BEC kapalı</text>
         <path class="lead-thin" d="M90 722 H66 M90 735 H66 M90 748 H66"/>
         <circle class="box" cx="45" cy="735" r="20"/>
         <text class="t-box" x="45" y="740" text-anchor="middle">M</text>
@@ -240,6 +241,15 @@ td.dim{color:var(--muted)}
         <path class="pwr" style="stroke:var(--w-black)" d="M190 770 V806"/>
         <rect class="box" x="90" y="806" width="140" height="50" rx="4"/>
         <text class="t-box" x="160" y="836" text-anchor="middle">LiPo</text>
+
+        <!-- UBEC: karti ve servolari besler; ayni LiPo'dan, ESC'den bagimsiz -->
+        <path class="casing-p" d="M230 820 H330 V770"/>
+        <path class="pwr" style="stroke:var(--w-red)" d="M230 820 H330 V770"/>
+        <path class="casing-p" d="M230 840 H368 V770"/>
+        <path class="pwr" style="stroke:var(--w-black)" d="M230 840 H368 V770"/>
+        <rect class="box" x="250" y="700" width="140" height="70" rx="4"/>
+        <text class="t-box" x="320" y="730" text-anchor="middle">UBEC</text>
+        <text class="t t-mute" x="320" y="750" text-anchor="middle">5V · 3A</text>
 
         <!-- ================= SAG: nRF24L01 ================= -->
         <rect class="rfpcb" x="972" y="190" width="278" height="180" rx="6"/>
@@ -295,7 +305,7 @@ td.dim{color:var(--muted)}
         <text class="t t-ink" x="646" y="449">CE</text>
       </svg>
     </div>
-    <figcaption>Pin yazıları senin kartındaki gibi (38 pinli DevKitC, anten yukarıda, bileşen tarafı). Kesik kırmızı çizgi kartın altından geçen kabloyu gösterir; perfboard'da kartın arka tarafından geçir, antenin üstünden geçirme. Servo rayında sıra her satırda − / + / S. ESC kablosunun üç teli ayrı çizildi: beyaz sinyal 25'e, kırmızı BEC 5V kartın 5V hattına, siyah GND'ye. Kablo renkleri öneri. nRF24 konnektörünün yönünü gerçek modülde kare pad ve arkadaki baskıyla doğrula.</figcaption>
+    <figcaption>Pin yazıları senin kartındaki gibi (38 pinli DevKitC, anten yukarıda, bileşen tarafı). Kesik kırmızı çizgi kartın altından geçen kabloyu gösterir; perfboard'da kartın arka tarafından geçir, antenin üstünden geçirme. Servo rayında sıra her satırda − / + / S. ESC kablosunun telleri ayrı çizildi: beyaz sinyal 25'e, siyah GND'ye; BEC teli kullanılmıyor, 5 V ayrı UBEC'ten geliyor. Kablo renkleri öneri. nRF24 konnektörünün yönünü gerçek modülde kare pad ve arkadaki baskıyla doğrula.</figcaption>
   </figure>
 
   <div class="two">
@@ -308,7 +318,7 @@ td.dim{color:var(--muted)}
             <tr><td>ESC sinyal</td><td class="m">GPIO25 <span class="silk">25</span></td><td><span class="sw"><i style="background:var(--w-white)"></i>beyaz</span></td><td><span class="tag">10k → GND</span></td></tr>
             <tr><td>Elevator</td><td class="m">GPIO26 <span class="silk">26</span></td><td><span class="sw"><i style="background:var(--w-yellow)"></i>sarı</span></td><td class="dim">Servo rayı</td></tr>
             <tr><td>Rudder</td><td class="m">GPIO27 <span class="silk">27</span></td><td><span class="sw"><i style="background:var(--w-purple)"></i>mor</span></td><td class="dim">Servo rayı</td></tr>
-            <tr><td>Kart + servo beslemesi</td><td class="m">5V <span class="silk">sol alt</span></td><td><span class="sw"><i style="background:var(--w-red)"></i>kırmızı</span></td><td class="dim">ESC BEC çıkışından, hatta kondansatör</td></tr>
+            <tr><td>Kart + servo beslemesi</td><td class="m">5V <span class="silk">sol alt</span></td><td><span class="sw"><i style="background:var(--w-red)"></i>kırmızı</span></td><td class="dim">Ayrı UBEC (5V/3A) çıkışından, hatta kondansatör</td></tr>
             <tr><td>Ortak toprak</td><td class="m">GND <span class="silk">sol</span></td><td><span class="sw"><i style="background:var(--w-black)"></i>siyah</span></td><td class="dim">Ray, ESC, kondansatör</td></tr>
           </tbody>
         </table>
@@ -347,20 +357,20 @@ td.dim{color:var(--muted)}
         <p>C3'teki "ESC GPIO0 + 10k pulldown" düzeni bu kartta her açılışta yükleme moduna sokar; uçak hiç açılmaz. ESC 25'te, 10k direnç o hatla GND arasında.</p>
       </div>
       <div class="note warn">
-        <h3>BEC hattındaki kondansatör şart</h3>
-        <p>ESC'nin BEC'i kartı ve iki servoyu birlikte besliyor. Servo ani hareket ettiğinde hat çöker, kondansatör bunu karşılıyor. Seri logda <code>BROWNOUT</code> görürsen önce kondansatörü ve GND'yi kontrol et; sürerse servoları ayrı UBEC'e al.</p>
+        <h3>5V hattındaki kondansatör şart</h3>
+        <p>UBEC kartı ve iki servoyu birlikte besliyor. Servo ani hareket ettiğinde hat çöker, kondansatör bunu karşılıyor. Seri logda <code>BROWNOUT</code> görürsen önce kondansatörü ve GND'yi kontrol et; sürerse UBEC'in akımına (3 A) ve besleme kablosunun kesitine bak.</p>
       </div>
       <div class="note warn">
         <h3>3V3 sol üstte, 5V sol altta</h3>
-        <p>nRF24 yalnızca <code>3V3</code>'e bağlanır. BEC hattı <code>5V</code>'a gider. İkisi aynı sırada ama zıt uçlarda; nRF24'ü 5V'a bağlamak modülü yakar.</p>
+        <p>nRF24 yalnızca <code>3V3</code>'e bağlanır. UBEC hattı <code>5V</code>'a gider. İkisi aynı sırada ama zıt uçlarda; nRF24'ü 5V'a bağlamak modülü yakar.</p>
       </div>
       <div class="note">
         <h3>Uzak durulacak diğer pinler</h3>
         <p><code>0, 2, 12, 15</code> açılış modunu belirler, <code>14</code> açılışta PWM çıkarır, <code>TX / RX</code> USB seriye bağlı. <code>32 / 33</code> firmware'de aileron için ayrılmış, bu uçakta boş. Batarya ölçümü eklersen ADC1 pini (ör. <code>35</code>) kullan.</p>
       </div>
       <div class="note">
-        <h3>USB ve BEC aynı anda</h3>
-        <p>Kartın USB 5 V hattında diyot yoksa BEC bilgisayarın USB portuna geri besler. Yükleme yaparken LiPo'yu çıkar. Pin taraması (<code>t</code> / <code>p</code>) sırasında ESC, servolar ve nRF24 ayrı olmalı.</p>
+        <h3>USB ve UBEC aynı anda</h3>
+        <p>Kartın USB 5 V hattında diyot yoksa UBEC bilgisayarın USB portuna geri besler. Yükleme yaparken LiPo'yu çıkar. Pin taraması (<code>t</code> / <code>p</code>) sırasında ESC, servolar ve nRF24 ayrı olmalı.</p>
       </div>
     </div>
   </section>

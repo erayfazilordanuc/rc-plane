@@ -69,9 +69,9 @@ Tam şema: `flight_software/docs/kablolama.html`.
 Kaçınılan pinler: **GPIO 0, 2, 12, 15** (strapping), **14** (boot'ta PWM), **6–11**
 (flash — kartta `D0–D3`, `CMD`, `CLK` yazar; `D2` GPIO2 değil), **1, 3** (UART0).
 
-**Beslemeler:** nRF24 mutlaka 3.3 V (38 pinli kartta 3V3 sol üst pin). Ayrı UBEC yok:
-ESC'nin BEC çıkışı kartın 5V pinine gelir, servolar oradan beslenir; BEC hattında 5V–GND
-arası kondansatör var. GND'ler ortak olmalı.
+**Beslemeler:** nRF24 mutlaka 3.3 V (38 pinli kartta 3V3 sol üst pin). Kart ve servolar
+**ayrı bir UBEC'ten** (5 V / 3 A) besleniyor, ESC'nin lineer BEC'i devre dışı; 5 V hattında
+5V–GND arası kondansatör var. GND'ler ortak olmalı.
 
 Uçak boot logunda reset sebebini basıyor. `BROWNOUT` görüyorsan sorun besleme, yazılım
 değil — kod bunu düzeltemez.
@@ -175,7 +175,7 @@ Gerekçe: `PA_LOW`'da menzil kapalı alanda birkaç duvarı geçemiyordu.
 Brown-out geri gelirse gizlenmiyor: uçakta `kurt=N`, kumandada `kurtarma=N`
 sayacları artar. **Artıyorsa** besleme yetersiz — modül bacağına en yakın
 noktada 10–100 µF **+ 100 nF seramik** (elektrolitik tek başına RF transient
-hızında yavaştır), servolara ayrı UBEC, GND'ler ortak.
+hızında yavaştır); servo beslemesi zaten ayrı UBEC'te, GND'ler ortak olmalı.
 
 **Menzil beklentisi.** 250 kbps'te alıcı hassasiyeti ~−94 dBm (2 Mbps'te
 ~−85 dBm), yani seçilen hız tek başına ~9 dB / ~2.8 kat menzil kazandırıyor.

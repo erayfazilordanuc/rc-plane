@@ -10,7 +10,7 @@
 // derler, dolayisiyla dosya tasima/yer degistirme gerekmez.
 //
 // UYARI: PERVANE TAKILI OLMASIN!
-// Kart ve servolar ESC'nin BEC 5V hattindan beslenir, GND'ler ortak olmali.
+// Kart ve servolar ayri UBEC'in 5V hattindan beslenir, GND'ler ortak olmali.
 // 't' ve 'p' testlerinde ESC'yi ayir, karti USB'den besle.
 // ============================================================
 // Uc cikisin hepsi cipin LEDC birimiyle surulur, ESP32Servo kullanilmaz:

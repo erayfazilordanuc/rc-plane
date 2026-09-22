@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 800" width="1180" height="800" role="img" aria-label="Aircraft wiring. ESP32 DevKitC: GPIO25 to ESC signal with a 10k pull-down, GPIO26 elevator servo, GPIO27 rudder servo, all through a servo rail. ESC BEC 5 V feeds the rail and the board 5V pin, with a bulk capacitor. LiPo 3S feeds only the ESC, which drives an A2212 motor. nRF24L01+ on 3V3 with a 10-100 uF capacitor: MOSI 23, MISO 19, SCK 18, CSN 5, CE 4.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 800" width="1180" height="800" role="img" aria-label="Aircraft wiring. ESP32 DevKitC: GPIO25 to ESC signal with a 10k pull-down, GPIO26 elevator servo, GPIO27 rudder servo, all through a servo rail. The 3S LiPo feeds both a 30 A ESC driving the A2212 motor and a separate 5 V 3 A UBEC, which powers the servo rail and the board 5V pin through a bulk capacitor; the ESC's own BEC is disabled. nRF24L01+ on 3V3 with a 10-100 uF capacitor: MOSI 23, MISO 19, SCK 18, CSN 5, CE 4.">
 
 <style>
   .bg{fill:#f6f8fa} .card{fill:#ffffff;stroke:#d1d9e0;stroke-width:1}
@@ -57,7 +57,9 @@
 
 <path class="casp" d="M325 370 V670 H460"/><path class="p red" d="M325 370 V670 H460"/>
 
-<path class="casp" d="M300 370 V520 H317 A8 8 0 0 1 333 520 H460"/><path class="p black" d="M300 370 V520 H317 A8 8 0 0 1 333 520 H460"/>
+<path class="casp" d="M300 370 V665"/><path class="p black" d="M300 370 V665"/>
+
+<path class="casp" d="M300 520 H317 A8 8 0 0 1 333 520 H460"/><path class="p black" d="M300 520 H317 A8 8 0 0 1 333 520 H460"/>
 
 <rect class="pcb" x="440" y="70" width="200" height="640" rx="8"/>
 <rect class="pcb2" x="500.0" y="78" width="80" height="24" rx="2"/>
@@ -107,27 +109,50 @@
 <rect class="metal" x="520.0" y="700" width="40" height="22" rx="3"/>
 <text class="mono s11 mute" x="540.0" y="740" text-anchor="middle">USB</text>
 
-<path class="casp" d="M140 126 V170"/><path class="p red" d="M140 126 V170"/>
+<path class="casp" d="M140 126 V140 H70 V665 H100"/><path class="p black" d="M140 126 V140 H70 V665 H100"/>
 
-<path class="casp" d="M190 126 V170"/><path class="p black" d="M190 126 V170"/>
+<path class="casp" d="M140 140 V170"/><path class="p black" d="M140 140 V170"/>
+
+<path class="casp" d="M190 126 V155 H85 V645 H100"/><path class="p red" d="M190 126 V155 H85 V645 H100"/>
+
+<path class="casp" d="M190 155 V170"/><path class="p red" d="M190 155 V170"/>
+
+<circle class="dot" cx="140" cy="140" r="4.5"/>
+
+<circle class="dot" cx="190" cy="155" r="4.5"/>
 
 <rect class="box" x="100" y="80" width="130" height="46" rx="4"/>
 <text class="sans s13 b ink" x="165" y="100" text-anchor="middle">LiPo 3S</text>
 
-<text class="sans s12 mute" x="165" y="117" text-anchor="middle">2200 mAh</text>
+<text class="sans s12 mute" x="165" y="117" text-anchor="middle">2200 mAh · 30C</text>
 
-<path class="thin" d="M100 193 H72 M100 205 H72 M100 217 H72"/>
+<path class="thin" d="M100 178 H58 M100 190 H58 M100 202 H58"/>
 <rect class="box" x="100" y="170" width="130" height="70" rx="4"/>
-<text class="sans s13 b ink" x="165" y="200" text-anchor="middle">ESC</text>
+<text class="sans s13 b ink" x="165" y="200" text-anchor="middle">ESC 30 A</text>
 
-<text class="sans s12 mute" x="165" y="219" text-anchor="middle">BEC 5 V out</text>
+<text class="sans s12 mute" x="165" y="219" text-anchor="middle">BEC disabled</text>
 
-<circle class="box" cx="48" cy="205" r="24"/>
-<text class="sans s13 b ink" x="48" y="210" text-anchor="middle">M</text>
+<circle class="box" cx="36" cy="190" r="22"/>
+<text class="sans s13 b ink" x="36" y="195" text-anchor="middle">M</text>
 
-<text class="sans s11 mute" x="48" y="248" text-anchor="middle">A2212</text>
+<text class="sans s11 mute" x="36" y="230" text-anchor="middle">A2212</text>
 
-<text class="sans s11 mute" x="48" y="262" text-anchor="middle">1000 KV</text>
+<text class="sans s11 mute" x="36" y="244" text-anchor="middle">1000 KV</text>
+
+<text class="sans s11 mute" x="36" y="258" text-anchor="middle">10×4.5</text>
+
+<rect class="box" x="100" y="620" width="130" height="70" rx="4"/>
+<text class="sans s13 b ink" x="165" y="650" text-anchor="middle">UBEC</text>
+
+<text class="sans s12 mute" x="165" y="669" text-anchor="middle">5 V · 3 A</text>
+
+<path class="casp" d="M230 645 H292 A8 8 0 0 1 308 645 H325"/><path class="p red" d="M230 645 H292 A8 8 0 0 1 308 645 H325"/>
+
+<path class="casp" d="M230 665 H300"/><path class="p black" d="M230 665 H300"/>
+
+<circle class="dot" cx="325" cy="645" r="4.5"/>
+
+<circle class="dot" cx="300" cy="665" r="4.5"/>
 
 <path class="lead" d="M286 370 H240 V205 H230"/><path class="w white" d="M286 370 H240 V205 H230"/>
 <path class="lead" d="M286 400 H258 V495 H230"/><path class="w yellow" d="M286 400 H258 V495 H230"/>
@@ -191,9 +216,9 @@
 
 <text class="sans s11 mute" x="385" y="632" text-anchor="middle">bulk cap</text>
 
-<text class="sans s11 mute" x="385" y="646" text-anchor="middle">on BEC line</text>
+<text class="sans s11 mute" x="385" y="646" text-anchor="middle">on 5 V rail</text>
 
-<text class="sans s11 mute" x="430" y="662" text-anchor="end">BEC 5 V</text>
+<text class="sans s11 mute" x="430" y="662" text-anchor="end">UBEC 5 V</text>
 
 <text class="sans s11 mute" x="430" y="512" text-anchor="end">GND</text>
 
@@ -257,22 +282,22 @@
 <rect class="card" x="670" y="515" width="490" height="164" rx="6"/>
 <text class="sans h2 ink" x="688" y="543">Notes</text>
 <text class="sans s13 ink" x="688" y="571">nRF24 VCC → 3V3 (top-left pin). Never 5 V.</text>
-<text class="sans s13 ink" x="688" y="595">No separate UBEC: the ESC's BEC feeds the board and both servos.</text>
+<text class="sans s13 ink" x="688" y="595">Board and servos run from a separate 5 V / 3 A UBEC; the ESC's BEC is disabled.</text>
 <text class="sans s13 ink" x="688" y="619">10k on GPIO25 holds the ESC line low while the board boots.</text>
 <text class="sans s13 ink" x="688" y="643">Keep off GPIO 0, 2, 12, 15, 14 and the flash pins D0–D3 / CMD / CLK.</text>
 <text class="sans s13 ink" x="688" y="667">Unplug the LiPo before connecting USB to flash.</text>
 
-<path class="casp" d="M28 652 H56"/><path class="p red" d="M28 652 H56"/>
+<path class="casp" d="M684 735 H712"/><path class="p red" d="M684 735 H712"/>
 
-<text class="sans s12 ink" x="68" y="657">5 V from ESC BEC</text>
+<text class="sans s12 ink" x="722" y="740">5 V · UBEC</text>
 
-<path class="casp" d="M28 678 H56"/><path class="p black" d="M28 678 H56"/>
+<path class="casp" d="M812 735 H840"/><path class="p black" d="M812 735 H840"/>
 
-<text class="sans s12 ink" x="68" y="683">GND</text>
+<text class="sans s12 ink" x="850" y="740">GND</text>
 
-<path class="cas dash" d="M28 704 H56"/><path class="w red dash" d="M28 704 H56"/>
+<path class="cas dash" d="M902 735 H930"/><path class="w red dash" d="M902 735 H930"/>
 
-<text class="sans s12 ink" x="68" y="709">3.3 V, under the board</text>
+<text class="sans s12 ink" x="940" y="740">3.3 V, under the board</text>
 
 </g>
 </svg>

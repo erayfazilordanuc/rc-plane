@@ -1,171 +1,137 @@
-# RC Plane — Gövde Tasarımı ve Yapım Planı
+# RC Plane — Mekanik Tasarım Kararları
 
-3 kanallı (gaz, elevator, rudder) eğitim uçağı. Fotoblok levha ve ahşap çıtadan,
-elde kesilerek yapıldı. Aileron yok: yatış, kanadın polihedral kırımı ve rudder ile
-sağlanıyor.
+3 kanallı (gaz, elevator, rudder) eğitim uçağı. 5 mm fotobloktan elde kesildi.
+Aileron yok: yatış, kanadın dihedral kırımı ve rudder ile sağlanıyor.
+
+Aşağıdaki değerler **yapılmış uçağın** değerleri. İlk tasarım planından üç önemli fark var:
+polihedral (640/380 bölünmesi) terk edildi ve dihedral tam ortaya alındı, kanat hücum kenarı
+montajda 285 yerine 230'a geldi, uçuşa hazır ağırlık 976 g tahmini yerine **1105 g** çıktı.
 
 ![Gövde ölçüleri](diagrams/airframe_layout.svg)
 
-> Bu belgedeki değerler **tasarım** değerleridir. Uçağın tartılmış ağırlığı ve ölçülmüş
-> ağırlık merkezi henüz buraya işlenmedi.
-
-Tüm ölçüler mm. Sıfır noktası firewall (motor perdesi).
+Tüm ölçüler mm. Sıfır noktası firewall.
 
 ---
 
-## 1. Ana ölçüler
+## 1. Kanat
 
-| | Değer |
+| | |
 |---|---|
-| Kanat açıklığı | 1400 |
-| Veter | 200 (dikdörtgen) |
-| Kanat alanı | 28 dm² |
-| Panel bölünmesi | 380 + 640 + 380 |
-| Polihedral kırım | ±320 |
-| Kırım açısı / uç takozu | 8° / 53 mm |
-| Profil | KFm-2, basamak hücum kenarından 100 mm geride |
-| Profil kalınlığı | ön yarı 10, arka yarı 5 |
-| Kiriş (çıta) ekseni | hücum kenarından 50 mm geride |
-| Gövde uzunluğu | 1050 |
-| Gövde kesiti | 75 en × 80 yükseklik (kuyrukta 45 yükseklik) |
-| Kanat hücum kenarı | firewall'dan 285 |
-| **Ağırlık merkezi (CG)** | **hücum kenarından 50 mm geride** (veterin %25'i, çıta hizası) |
-| Yatay dengeleyici | 400 × 150 |
-| Dikey dengeleyici | 180 yükseklik, kök 140 / uç 100 |
+| Açıklık / veter | 1400 / 200 sabit |
+| Alan | 28 dm² |
+| Plan | Dikdörtgen, sivrilme yok |
+| Dihedral | **10°**, tam ortadan tek kırım — uçta ≈ 123 mm yükselme |
+| Profil | KFm-2, basamak hücum kenarından 100 mm (%50 veter) |
+| Kalınlık | Ön yarı 10 mm, arka yarı 5 mm |
+| Kiriş | Hücum kenarından 50 mm geride |
+
+- Üst katman iki şeride bölünüp **çıta aralarına gömüldü**; üst ve alt çıta çifti birlikte
+  I-kiriş gibi çalışıyor.
+- Kökte kiriş bindirmesi en az 200 mm, alt ve üstte takviye plakası. Eğilme momenti en çok
+  kökte, çift kalınlık oraya denk geliyor.
+- **Alt yüz baştan sona şeffaf bantlı:** hem nem bariyeri hem burulma rijitliği.
+- Aileron bölgesi (uçtan 250 × 45 mm) işaretlendi ama **kesilmedi**. Firmware ve protokol
+  4 kanalı zaten destekliyor; kanat sonradan aileronlu hale getirilebilir.
+
+## 2. Gövde
+
+| | |
+|---|---|
+| Uzunluk | 1050 |
+| Kesit | 75 × 80 |
+| Kuyruk | Yan görünüşte 45 mm'ye daralıyor, genişlik sabit 75 |
+| Firewall | 3 mm kontrplak, epoksi, 20 mm yuvaya oturuyor |
+
+- Yan duvar eki **x=400**, üst güverte eki **x=600**. İkisi bilerek aynı istasyona
+  getirilmedi; aynı kesitte buluşurlarsa gövde orada zayıflar.
+- Kanat bölgesine (x=285–485) iç yüzden **çift kat doubler**.
+- Ara bölmeler: **x=150, 285, 485, 750**.
+- **İniş takımı yok:** elden fırlatma, karın inişi. Burun altına kurban şeridi ve bant.
+
+## 3. Yerleşim ve denge
+
+| | |
+|---|---|
+| Kanat hücum kenarı | x=230 *(tasarımda 285 idi, montajda 230'a geldi)* |
+| **Ağırlık merkezi** | **x=280** — hücum kenarından 50 mm, veterin %25'i |
+
+- **Batarya cırt bantla ayarlanabilir.** CG'nin tek düzeltme aracı bu; kurşun eklenmiyor.
+- **Kanat gövdeye yapışık değil:** iki ahşap pim + kauçuk lastik. Sert bir inişte kanat
+  yerinden çıkıyor — tasarlanmış kırılma noktası.
+
+## 4. Açılar
+
+| | |
+|---|---|
+| Kanat hücum açısı | +1,4° (5 mm takoz) |
+| Yatay dengeleyici | 0° — dekalaj 1,4° |
+| Motor | 2° aşağı, 2° sağ |
+
+Firewall dik kesildi; motor açıları montaj pulu ile veriliyor.
+
+## 5. Kuyruk
+
+| | |
+|---|---|
+| Yatay | 400 × 150 (kanadın %21'i), **Vh = 0,70** |
+| Elevator | Veterin %35'i = 52 mm |
+| Dikey | 180 yükseklik, kök 140 / uç 100, **Vv = 0,036** |
+| Rudder | 50 mm sabit genişlik, firar kenarı dik |
+| Kuyruk momenti | ~630 mm = 3,1 × veter |
+
+- **Menteşe:** iki yüzden 45° tıraş, tek taraftan bant.
+- **Sapmalar:** elevator ±14 mm, rudder ±20 mm. Mekanik nötr ayarlı; ince ayar
+  arayüzdeki servo kalibrasyonundan yapılıyor (yön, nötr, uç noktalar uçağın NVS'inde).
+
+## 6. Güç sistemi
+
+| | |
+|---|---|
 | Motor / pervane | A2212 1000 KV / 10×4.5 |
-| Tahmini toplam ağırlık | ~976 g → 35 g/dm² |
+| ESC | 30 A |
+| Batarya | 3S 2200 mAh 30C |
+| 5 V | **Ayrı UBEC, 5 V / 3 A** — ESC'nin lineer BEC'i devre dışı |
+| Akım hedefi | Tam gazda 25 A altı |
 
-Levha boyutu 50×70 cm olduğu için tek parça 700 mm'lik orta panel mümkün değildi
-(kesim payı sıfır kalıyordu). Bu yüzden orta panel 640, uç paneller 380 yapıldı;
-kırım ±320'ye kaydı. Daha içeriden kırılan kanat biraz daha fazla yatış kararlılığı
-veriyor, yani bu kayma aleyhe değil.
+ESC'nin lineer BEC'i devre dışı bırakıldı; kart ve iki servo ayrı UBEC'ten besleniyor.
+Bağlantı şeması: [`diagrams/aircraft_wiring.svg`](diagrams/aircraft_wiring.svg).
 
----
+## 7. Malzeme ve yapım
 
-## 2. Kanat kesiti ve kiriş
+- **5 mm kraft fotoblok**, 50 × 70 cm levha. Hiçbir parça 700 mm'yi geçmiyor; gövdenin uzun
+  parçaları ekleme yapılarak elde edildi.
+- **Sıcak silikon** ana yapıştırıcı; epoksi yalnızca firewall'da.
+- **Ahşap çıta kiriş** (karbon yerine).
+- Tutkal **köpük yüzeye** sürülüyor, kağıda değil.
 
-Üst katman iki şerit halinde kesilir, aradaki boşluğa çıta konur. Aşağıdaki ölçüler
-**10 mm genişliğinde çıta** içindir. Çıta farklıysa: ön şerit = arka şerit = 50 − G/2,
-boşluk = G.
+Yapım sırası: test parçası (45° eğik kesim, çizik derinlikleri, bant menteşe) → 1:1 şablonlar
+→ kanat panelleri ve çıta → ortadan dihedral kırımı → kök takviyesi → gövde yan duvarları,
+ekler, doubler'lar, firewall → ara bölmeler → **UBEC hattını masada dene** → elektronik ve
+üst güverte → kuyruk yüzeyleri → pushrod ve mekanik nötr → son CG ölçümü.
 
----
+## 8. Kütle
 
-## 3. Kesim listesi
-
-Hiçbir parça 700 mm'yi geçmiyor. Gövdenin uzun parçaları eklenerek yapılıyor, ek yerleri
-kaydırılmış.
-
-| Parça | Ölçü | Adet |
-|---|---|---|
-| Kanat tabanı — orta | 640 × 200 | 1 |
-| Kanat tabanı — uç | 380 × 200 | 2 |
-| KFm ön şerit — orta | 640 × 45 | 1 |
-| KFm arka şerit — orta | 640 × 45 | 1 |
-| KFm ön şerit — uç | 380 × 45 | 2 |
-| KFm arka şerit — uç | 380 × 45 | 2 |
-| Kırım takviyesi | 160 × 80 | 4 |
-| Yan duvar — ön | 400 × 80 | 2 |
-| Yan duvar — arka | 650 × 80 (45'e daralan) | 2 |
-| Üst güverte — ön | 600 × 75 | 1 |
-| Üst güverte — arka | 450 × 75 | 1 |
-| Alt panel — ön | 485 × 75 | 1 |
-| Alt panel — arka | 570 × 75 | 1 |
-| Kanat doubler | 200 × 80 | 4 |
-| Ara bölme | 75 × 80 | 3 |
-| Ara bölme — arka | 75 × 55 | 1 |
-| Yatay dengeleyici | 400 × 150 | 1 |
-| Dikey dengeleyici | 180 × 140 | 1 |
-
-**Ek yeri kuralı:** yan duvarlar x=400'de, üst güverte x=600'de ekleniyor. İkisi aynı
-istasyona denk gelmemeli, yoksa gövdede zayıf bir kesit oluşur. Her ek yerinin iç
-yüzüne 100 mm bindirme parçası.
-
-Firewall'un 3B baskı modeli: [`cad/print_files/Firewall.stl`](../cad/print_files/Firewall.stl)
-(63 × 95 × 22 mm).
-
----
-
-## 4. Levha yerleşimi — 4 levha
-
-| Levha | İçerik |
+| | |
 |---|---|
-| 1 | Kanat tabanı orta (640×200) + KFm orta şeritler + kırım takviyeleri + ara bölmeler |
-| 2 | Kanat tabanı uçlar (2× 380×200) + KFm uç şeritler + yan duvar ön parçalar |
-| 3 | Yan duvar arka (2× 650×80) + üst güverte (600 + 450) + alt paneller (485 + 570) |
-| 4 | Yatay + dikey dengeleyici + kanat doubler'ları + yedek |
+| Uçuşa hazır | **1105 g** |
+| Kanat yükü | 39,5 g/dm² |
+| İtki/ağırlık | ~0,8 |
 
-Levha 3'teki parçaların hiçbiri 650 mm'yi geçmiyor, toplam genişlik 460 mm; 500'lük
-levhaya sığıyor. **5 levha al**, biri fire payı.
+İtki/ağırlık 0,8 olduğu için dik tırmanış yok: elden fırlatmada burnu fazla kaldırmamak,
+hızı toplamasını beklemek gerekiyor.
+
+**CG kontrolü:** uçak bataryalı ve tam donanımlıyken, kanadın altından iki parmakla hücum
+kenarından 50 mm geriden tut. Yatay durmalı ya da burnu hafif aşağı bakmalı. Kuyruk
+düşüyorsa bataryayı öne kaydır.
 
 ---
 
-## 5. Çıta planı — 50 cm'lik çıtalar
+## İlk plandan neler değişti
 
-| Bölge | Uzunluk | Çıta |
+| Konu | Plan | Yapılan |
 |---|---|---|
-| Orta panel — üst | 640 | 2× 500, kökte ortalanmış 360 bindirme |
-| Orta panel — alt | 640 | 2× 500, aynı şekilde |
-| Sol uç panel — üst | 330 | 1× 500'den kesim |
-| Sağ uç panel — üst | 330 | 1× 500'den kesim |
-
-**Toplam 6 adet 50 cm çıta.**
-
-Bindirme kanat kökünde ortalanıyor: bir çıta −320'den +40'a, diğeri −40'tan +320'ye.
-Eğilme momentinin en büyük olduğu yer kök, çift kalınlık tam gerektiği yere denk geliyor.
-
-Bindirme bölgesinde iki çıta **yan yana** duruyor, üst üste değil; 5 mm'lik boşluğa
-10 mm sığmaz. O bölgede kanal genişliği 20 mm.
-
-Uç panellerde alt çıta yok; oradaki eğilme momenti düşük, bant yeterli.
-
----
-
-## 6. Ağırlık ve denge (tasarım tahmini)
-
-| Kalem | g |
-|---|---|
-| Fotoblok — kanat | 235 |
-| Fotoblok — gövde | 190 |
-| Fotoblok — kuyruk | 43 |
-| Ahşap çıta (6 adet) | 35 |
-| Kontrplak firewall | 25 |
-| Tutkal + bant | 90 |
-| Motor + ESC + pervane | 95 |
-| Batarya 3S 2200 | 180 |
-| Servo × 2 (9 g) | 18 |
-| ESP32 DevKitC + nRF24 PA/LNA + kablo | 45 |
-| Pushrod, yeke, dowel | 20 |
-| **Toplam** | **976** |
-
-Kanat yükü 35 g/dm². İtki/ağırlık ≈ 0.97.
-
-> İlk planda uçuş kartı ESP32-C3 SuperMini ve ayrı bir UBEC vardı. Uçan uçakta
-> ESP32 DevKitC var ve UBEC yok (servolar ESC'nin BEC'inden besleniyor). Elektronik
-> satırı bu yüzden yeniden tartılmalı.
-
-**CG kontrolü:** uçak tam donanımlı ve bataryası takılıyken, kanadın altından iki
-parmakla hücum kenarından 50 mm geride tut. Yatay durmalı ya da burnu hafifçe aşağı
-eğilmeli. Kuyruk düşüyorsa bataryayı öne kaydır; kurşun ekleme.
-
----
-
-## 7. Yapım sırası
-
-1. **Test parçası:** 220×300 mm. 45° eğik kesim, 2/3 ve 1/3 derinlikte çizik, bant menteşe
-2. 1:1 kağıt şablonlar
-3. Kanat tabanı ve KFm şeritlerini kes
-4. Ön şerit → çıta → arka şerit sırasıyla yapıştır, hücum kenarını 45° tıraşla
-5. Polihedral kırım (53 mm takoz, ağırlık altında, en az 30 dk)
-6. Kırım takviyeleri + bant
-7. Alt çıta, sonra alt yüz bandı
-8. Gövde: yan duvarlar → ekler → doubler'lar → firewall (epoksi) → ara bölmeler → alt panel
-9. **BEC hattını masada test et:** ESC → kart 5V → servolar; seri logda `BROWNOUT` görülmemeli
-10. Elektronik montaj, üst güverte
-11. Kuyruk yüzeyleri, hizalayarak
-12. Pushrod ve mekanik nötr ayarı; ardından arayüzden servo kalibrasyonu
-13. Son CG ölçümü
-
-Alt çıtayı 7. adımdan önce takma: kanadı masaya düz bastıramazsın ve burulma kalıcı olur.
-
-Elektronik bağlantı şeması: [`diagrams/aircraft_wiring.svg`](diagrams/aircraft_wiring.svg)
-ve [`firmware/flight_software/docs/kablolama.html`](../firmware/flight_software/docs/kablolama.html).
+| Kanat kırımı | Polihedral, 640 + 380 panel, ±320'de kırım | 10° dihedral, ortadan tek kırım |
+| Kanat hücum kenarı | x=285 | x=230 |
+| 5 V | ESC'nin BEC'i | Ayrı UBEC 5 V / 3 A, ESC BEC devre dışı |
+| Ağırlık | 976 g tahmini | 1105 g ölçülen |
+| Kanat yükü | 35 g/dm² | 39,5 g/dm² |

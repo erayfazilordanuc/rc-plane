@@ -199,23 +199,37 @@ def aircraft():
 
     # --- guc: raydan karta (kartin altinda kalsin diye once) ---
     b.append(pwr("M325 370 V670 H460", "red"))
-    b.append(pwr("M300 370 V520 H317 A8 8 0 0 1 333 520 H460", "black"))
+    b.append(pwr("M300 370 V665", "black"))
+    b.append(pwr("M300 520 H317 A8 8 0 0 1 333 520 H460", "black"))
     b.append(board(440, 70, 200, 640, left, right, 30, 130, ("WROOM", "-32D")))
 
-    # --- LiPo, ESC, motor ---
-    b.append(pwr("M140 126 V170", "red"))
-    b.append(pwr("M190 126 V170", "black"))
+    # --- LiPo -> ESC + UBEC (pil hatti asagi, UBEC'e) ---
+    b.append(pwr("M140 126 V140 H70 V665 H100", "black"))
+    b.append(pwr("M140 140 V170", "black"))
+    b.append(pwr("M190 126 V155 H85 V645 H100", "red"))
+    b.append(pwr("M190 155 V170", "red"))
+    b.append(dot(140, 140))
+    b.append(dot(190, 155))
     b.append('<rect class="box" x="100" y="80" width="130" height="46" rx="4"/>')
     b.append(text(165, 100, "LiPo 3S", "sans s13 b ink", "middle"))
-    b.append(text(165, 117, "2200 mAh", "sans s12 mute", "middle"))
-    b.append('<path class="thin" d="M100 193 H72 M100 205 H72 M100 217 H72"/>')
+    b.append(text(165, 117, "2200 mAh · 30C", "sans s12 mute", "middle"))
+    b.append('<path class="thin" d="M100 178 H58 M100 190 H58 M100 202 H58"/>')
     b.append('<rect class="box" x="100" y="170" width="130" height="70" rx="4"/>')
-    b.append(text(165, 200, "ESC", "sans s13 b ink", "middle"))
-    b.append(text(165, 219, "BEC 5 V out", "sans s12 mute", "middle"))
-    b.append('<circle class="box" cx="48" cy="205" r="24"/>')
-    b.append(text(48, 210, "M", "sans s13 b ink", "middle"))
-    b.append(text(48, 248, "A2212", "sans s11 mute", "middle"))
-    b.append(text(48, 262, "1000 KV", "sans s11 mute", "middle"))
+    b.append(text(165, 200, "ESC 30 A", "sans s13 b ink", "middle"))
+    b.append(text(165, 219, "BEC disabled", "sans s12 mute", "middle"))
+    b.append('<circle class="box" cx="36" cy="190" r="22"/>')
+    b.append(text(36, 195, "M", "sans s13 b ink", "middle"))
+    b.append(text(36, 230, "A2212", "sans s11 mute", "middle"))
+    b.append(text(36, 244, "1000 KV", "sans s11 mute", "middle"))
+    b.append(text(36, 258, "10×4.5", "sans s11 mute", "middle"))
+    # UBEC: karti ve servolari besleyen tek 5 V kaynagi
+    b.append('<rect class="box" x="100" y="620" width="130" height="70" rx="4"/>')
+    b.append(text(165, 650, "UBEC", "sans s13 b ink", "middle"))
+    b.append(text(165, 669, "5 V · 3 A", "sans s12 mute", "middle"))
+    b.append(pwr("M230 645 H292 A8 8 0 0 1 308 645 H325", "red"))
+    b.append(pwr("M230 665 H300", "black"))
+    b.append(dot(325, 645))
+    b.append(dot(300, 665))
 
     # --- 3 telli kablolar: cihaz -> servo rayi ---
     for d, c in (("M286 370 H240 V205 H230", "white"),
@@ -257,8 +271,8 @@ def aircraft():
     b.append(ground(385, 598))
     b.append(dot(325, 560))
     b.append(text(385, 632, "bulk cap", "sans s11 mute", "middle"))
-    b.append(text(385, 646, "on BEC line", "sans s11 mute", "middle"))
-    b.append(text(430, 662, "BEC 5 V", "sans s11 mute", "end"))
+    b.append(text(385, 646, "on 5 V rail", "sans s11 mute", "middle"))
+    b.append(text(430, 662, "UBEC 5 V", "sans s11 mute", "end"))
     b.append(text(430, 512, "GND", "sans s11 mute", "end"))
 
     # --- nRF24 ---
@@ -279,26 +293,27 @@ def aircraft():
 
     b.append(notes(670, 515, 490, [
         "nRF24 VCC → 3V3 (top-left pin). Never 5 V.",
-        "No separate UBEC: the ESC's BEC feeds the board and both servos.",
+        "Board and servos run from a separate 5 V / 3 A UBEC; the ESC's BEC is disabled.",
         "10k on GPIO25 holds the ESC line low while the board boots.",
         "Keep off GPIO 0, 2, 12, 15, 14 and the flash pins D0–D3 / CMD / CLK.",
         "Unplug the LiPo before connecting USB to flash.",
     ]))
 
-    # lejant
-    b.append(pwr("M28 652 H56", "red"))
-    b.append(text(68, 657, "5 V from ESC BEC", "sans s12 ink"))
-    b.append(pwr("M28 678 H56", "black"))
-    b.append(text(68, 683, "GND", "sans s12 ink"))
-    b.append(wire("M28 704 H56", "red", dash=True))
-    b.append(text(68, 709, "3.3 V, under the board", "sans s12 ink"))
+    # lejant (notlarin altinda, tek satir)
+    b.append(pwr("M684 735 H712", "red"))
+    b.append(text(722, 740, "5 V · UBEC", "sans s12 ink"))
+    b.append(pwr("M812 735 H840", "black"))
+    b.append(text(850, 740, "GND", "sans s12 ink"))
+    b.append(wire("M902 735 H930", "red", dash=True))
+    b.append(text(940, 740, "3.3 V, under the board", "sans s12 ink"))
     b.append("</g>")
     body = "\n".join(B + b)
     return svg(1180, 800, body,
                "Aircraft wiring. ESP32 DevKitC: GPIO25 to ESC signal with a 10k pull-down, GPIO26 elevator "
-               "servo, GPIO27 rudder servo, all through a servo rail. ESC BEC 5 V feeds the rail and the "
-               "board 5V pin, with a bulk capacitor. LiPo 3S feeds only the ESC, which drives an A2212 "
-               "motor. nRF24L01+ on 3V3 with a 10-100 uF capacitor: MOSI 23, MISO 19, SCK 18, CSN 5, CE 4.")
+               "servo, GPIO27 rudder servo, all through a servo rail. The 3S LiPo feeds both a 30 A ESC "
+               "driving the A2212 motor and a separate 5 V 3 A UBEC, which powers the servo rail and the "
+               "board 5V pin through a bulk capacitor; the ESC's own BEC is disabled. nRF24L01+ on 3V3 "
+               "with a 10-100 uF capacitor: MOSI 23, MISO 19, SCK 18, CSN 5, CE 4.")
 
 
 # ---------------------------------------------------------------------------
@@ -363,27 +378,37 @@ def cg(x, y, r=10):
 
 
 def airframe():
+    """Ucagin YAPILMIS hali. Tasarim planindan farklari: polihedral yerine ortadan
+    tek dihedral kirimi, kanat HK 285 yerine 230, agirlik 1105 g."""
     s = 0.42
     fx, cy = 110, 370                     # firewall, govde ekseni
     X = lambda mm: round(fx + mm * s, 1)  # istasyon -> px
-    Y = lambda mm: round(cy + mm * s, 1)  # acikliktaki konum -> px
-    le, te = X(285), X(485)
+    Y = lambda mm: round(cy + mm * s, 1)  # aciklik -> px
+    le, te = X(230), X(430)
     b = []
     b.append(text(24, 30, "TOP VIEW", "sans s12 b mute"))
     # govde + motor + pervane
     b.append(f'<rect class="fill2" x="{fx}" y="{Y(-37.5)}" width="{round(1050*s,1)}" height="{round(75*s,1)}"/>')
     b.append(f'<rect class="box" x="{fx-18}" y="{cy-8}" width="18" height="16" rx="2"/>')
     b.append(f'<path class="prop" d="M{fx-22} {Y(-127)} V{Y(127)}"/>')
-    # kanat
+    # kanat: dikdortgen, sivrilme yok
     b.append(f'<rect class="outline" x="{le}" y="{Y(-700)}" width="{te-le}" height="{round(1400*s,1)}"/>')
-    for k in (-320, 320):
-        b.append(f'<path class="brk" d="M{le} {Y(k)} H{te}"/>')
-    b.append(f'<path class="spar" d="M{X(335)} {Y(-700)} V{Y(700)}"/>')
+    # aileron bolgesi: uctan 250, firar kenarindan 45 - isaretli, kesilmemis
+    for k in (-700, 450):
+        b.append(f'<rect class="brk" x="{X(385)}" y="{Y(k)}" width="{round(45*s,1)}" '
+                 f'height="{round(250*s,1)}" fill="none"/>')
+    b.append(text(te + 10, Y(-600), "aileron area", "sans s11 mute"))
+    b.append(text(te + 10, Y(-600) + 13, "250 × 45, not cut", "sans s11 mute"))
+    b.append(f'<path class="spar" d="M{X(280)} {Y(-700)} V{Y(700)}"/>')
+    # ara bolmeler
+    for st in (150, 285, 485, 750):
+        b.append(f'<path class="ext" d="M{X(st)} {Y(-37.5)} V{Y(37.5)}"/>')
+    b.append(text(X(760), Y(37.5) + 16, "bulkheads 150 / 285 / 485 / 750", "sans s11 mute", "end"))
     # yatay + dikey dengeleyici
     b.append(f'<rect class="outline" x="{X(900)}" y="{Y(-200)}" width="{round(150*s,1)}" height="{round(400*s,1)}"/>')
     b.append(f'<rect class="dot" x="{X(910)}" y="{cy-1.5}" width="{round(140*s,1)}" height="3"/>')
-    b.append(cg(X(335), cy))
-    b.append(text(X(335) + 14, cy - 20, "CG", "sans s12 b ink"))
+    b.append(cg(X(280), cy))
+    b.append(text(X(280) + 14, cy - 20, "CG", "sans s12 b ink"))
     # olculer
     b.append(f'<path class="ext" d="M{le} {Y(-700)} H44 M{le} {Y(700)} H44"/>')
     b.append(arrow_v(50, Y(-700), Y(700)))
@@ -391,18 +416,10 @@ def airframe():
     b.append(f'<path class="ext" d="M{le} {Y(-700)} V44 M{te} {Y(-700)} V44"/>')
     b.append(arrow_h(le, te, 50))
     b.append(text((le + te) / 2, 42, "200", "mono s13 ink", "middle"))
-    b.append(f'<path class="ext" d="M{te} {Y(-700)} H{te+36} M{te} {Y(-320)} H{te+36}"/>')
-    b.append(arrow_v(te + 30, Y(-700), Y(-320)))
-    b.append(text(te + 44, (Y(-700) + Y(-320)) / 2, "380", "mono s13 ink", "middle", -90))
-    b.append(f'<path class="ext" d="M{te} {cy} H{te+36}"/>')
-    b.append(arrow_v(te + 30, Y(-320), cy))
-    b.append(text(te + 44, (Y(-320) + cy) / 2, "320", "mono s13 ink", "middle", -90))
-    b.append(text(le - 8, Y(-320) - 6, "polyhedral break", "sans s11 mute", "end"))
-    b.append(text(le - 8, Y(-320) + 8, "8°, 53 mm tip block", "sans s11 mute", "end"))
-    b.append(text(X(335) + 6, Y(-700) + 18, "spar · 50 mm behind LE", "sans s11 warn", None, 90))
+    b.append(text(X(280) + 6, Y(-700) + 18, "spar · 50 mm behind LE", "sans s11 warn", None, 90))
     b.append(f'<path class="ext" d="M{fx} {cy+16} V706 M{X(1050)} {cy} V706 M{le} {Y(700)} V688"/>')
     b.append(arrow_h(fx, le, 682))
-    b.append(text((fx + le) / 2, 676, "285", "mono s12 ink", "middle"))
+    b.append(text((fx + le) / 2, 676, "230", "mono s12 ink", "middle"))
     b.append(arrow_h(fx, X(1050), 700))
     b.append(text((fx + X(1050)) / 2, 718, "1050 · firewall to tail", "mono s12 ink", "middle"))
     b.append(f'<path class="ext" d="M{X(900)} {Y(-200)} V264 M{X(1050)} {Y(-200)} V264"/>')
@@ -415,7 +432,7 @@ def airframe():
     # --- sag sutun ---
     R = 640
     b.append(text(R, 40, "Airframe", "sans h1 ink"))
-    b.append(text(R, 62, "design dimensions in mm · foam board, wooden spar", "sans s13 mute"))
+    b.append(text(R, 62, "as built, in mm · 5 mm foam board + wooden spar", "sans s13 mute"))
     # yan gorunus
     b.append(text(R, 98, "SIDE VIEW", "sans s12 b mute"))
     t = 0.28
@@ -423,47 +440,56 @@ def airframe():
     SX = lambda mm: round(sx + mm * t, 1)
     top_f, top_t = round(base - 80 * t, 1), round(base - 45 * t, 1)
     b.append(f'<path class="fill2" d="M{sx} {base} H{SX(1050)} V{top_t} L{SX(400)} {top_f} H{sx} Z"/>')
-    b.append(f'<path class="outline" d="M{SX(285)} {top_f} V{top_f-5.6} H{SX(385)} V{top_f-2.8} H{SX(485)} V{top_f} Z"/>')
+    # KFm-2: on yari kalin, arka yari ince
+    b.append(f'<path class="outline" d="M{SX(230)} {top_f} V{top_f-5.6} H{SX(330)} V{top_f-2.8} H{SX(430)} V{top_f} Z"/>')
     b.append(f'<rect class="outline" x="{SX(900)}" y="{top_t-2}" width="{round(150*t,1)}" height="2"/>')
     fin_top = round(top_t - 2 - 180 * t, 1)
     b.append(f'<path class="outline" d="M{SX(910)} {top_t-2} H{SX(1050)} V{fin_top} H{SX(950)} Z"/>')
     b.append(f'<rect class="box" x="{sx-14}" y="{base-18}" width="14" height="14" rx="2"/>')
     b.append(f'<path class="prop" d="M{sx-18} {base-11-35.6} V{base-11+35.6}"/>')
-    b.append(cg(SX(335), round(base - 40 * t, 1), 7))
-    b.append(text(SX(335), base + 22, "CG", "sans s12 b ink", "middle"))
-    b.append(text(SX(385), top_f - 14, "high wing", "sans s11 mute", "middle"))
+    # burun altinda kurban seridi
+    b.append(f'<path class="thin" style="stroke-width:3" d="M{sx} {base+3} H{SX(200)}"/>')
+    b.append(text(SX(100), base + 20, "sacrificial strip", "sans s11 mute", "middle"))
+    b.append(cg(SX(280), round(base - 40 * t, 1), 7))
+    b.append(text(SX(280) + 12, base + 20, "CG", "sans s12 b ink"))
+    b.append(text(SX(330), top_f - 14, "high wing · +1.4° incidence", "sans s11 mute", "middle"))
+    b.append(text(SX(1050), fin_top - 10, "stab 0° · decalage 1.4°", "sans s11 mute", "end"))
     # on gorunus
     b.append(text(R, 258, "FRONT VIEW", "sans s12 b mute"))
     f = 0.22
     c0, wy = 820, 318
     FX = lambda mm: round(c0 + mm * f, 1)
-    tip = round(wy - 53 * f, 1)
+    tip = round(wy - 123 * f, 1)   # 10 derece, uc yukselmesi 700*tan10
     tail_top = round(wy + 80 * f - 45 * f, 1)
     b.append(f'<circle cx="{c0}" cy="{round(wy+40*f,1)}" r="{round(127*f,1)}" fill="none" class="ext"/>')
     b.append(f'<path class="thin" d="M{c0} {tail_top} V{round(tail_top-180*f,1)}"/>')
     b.append(f'<path class="thin" d="M{FX(-200)} {tail_top} H{FX(200)}"/>')
     b.append(f'<rect class="fill2" x="{FX(-37.5)}" y="{wy}" width="{round(75*f,1)}" height="{round(80*f,1)}"/>')
     b.append(f'<polyline fill="none" class="thin" style="stroke-width:5;stroke-linejoin:round" '
-             f'points="{FX(-700)},{tip} {FX(-320)},{wy} {FX(320)},{wy} {FX(700)},{tip}"/>')
-    b.append(text(c0, 368, "8° polyhedral at ±320 · roll comes from rudder", "sans s12 mute", "middle"))
+             f'points="{FX(-700)},{tip} {c0},{wy} {FX(700)},{tip}"/>')
+    b.append(text(c0, 368, "10° dihedral, one break at the centre · roll comes from rudder",
+                  "sans s12 mute", "middle"))
 
     # tablo
     rows = [("Wingspan", "1400"), ("Chord", "200, constant"), ("Wing area", "28 dm²"),
-            ("Airfoil", "KFm-2, step 100 from LE"), ("Polyhedral", "8° at ±320"),
-            ("Fuselage", "1050 × 75 × 80"), ("Horizontal stab", "400 × 150"),
-            ("Fin", "180 high · 140 / 100 chord"), ("CG", "50 behind LE (25 %)"),
-            ("Motor · prop", "A2212 1000 KV · 10×4.5"), ("AUW, estimated", "≈ 976 g · 35 g/dm²")]
-    b.append(text(R, 404, "KEY NUMBERS", "sans s12 b mute"))
+            ("Airfoil", "KFm-2, step 100 from LE"), ("Dihedral", "10° · one break at centre"),
+            ("Fuselage", "1050 × 75 × 80"), ("Wing LE", "230 from firewall"),
+            ("CG", "280 · 50 behind LE (25 %)"), ("Incidence", "wing +1.4° · stab 0°"),
+            ("Horizontal stab", "400 × 150 · Vh 0.70"), ("Fin", "180 high · Vv 0.036"),
+            ("Ready to fly", "1105 g · 39.5 g/dm²")]
+    b.append(text(R, 398, "KEY NUMBERS", "sans s12 b mute"))
     for i, (k, v) in enumerate(rows):
-        yy = 430 + i * 25
+        yy = 422 + i * 24
         b.append(text(R, yy, k, "sans s13 ink"))
         b.append(text(980, yy, v, "mono s13 ink", "end"))
-        b.append(f'<path class="rule" d="M{R} {yy+8} H980"/>')
-    b.append(text(R, 718, "From the build plan. Weigh and balance the real aircraft.", "sans s11 mute"))
+        b.append(f'<path class="rule" d="M{R} {yy+7} H980"/>')
+    b.append(text(R, 706, "Motor 2° down, 2° right · elevator ±14 mm, rudder ±20 mm.", "sans s11 mute"))
+    b.append(text(R, 720, "No landing gear: hand launch, belly landing.", "sans s11 mute"))
     return svg(1000, 730, "\n".join(b),
-               "Airframe top, side and front views. Wingspan 1400 mm, constant 200 mm chord, 8 degree "
-               "polyhedral breaks at plus/minus 320 mm, fuselage 1050 mm, wing leading edge 285 mm behind "
-               "the firewall, CG 50 mm behind the leading edge on the spar line, stabiliser 400 by 150 mm.")
+               "Airframe top, side and front views as built. Wingspan 1400 mm, constant 200 mm chord, "
+               "10 degree dihedral with a single break at the centre, fuselage 1050 mm, wing leading edge 230 mm "
+               "behind the firewall, CG 280 mm on the spar line at 25 percent chord, stabiliser 400 by "
+               "150 mm, ready to fly 1105 g.")
 
 
 os.makedirs(OUT, exist_ok=True)

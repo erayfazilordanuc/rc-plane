@@ -27,8 +27,8 @@
 //   - Kalibrasyon uc noktalari RC_US_HARD_MIN..MAX ile kirpilir.
 //
 // UYARI: Tezgah denemelerinde PERVANE TAKILI OLMASIN!
-// Kart ve servolar ESC'nin BEC 5V hattindan beslenir (hatta kondansator var),
-// GND'ler ortak olmali.
+// Kart ve servolar ayri bir UBEC'in 5V hattindan beslenir (hatta kondansator
+// var), ESC'nin BEC'i kapali; GND'ler ortak olmali.
 // ============================================================
 // Uc cikisin hepsi cipin LEDC birimiyle surulur, ESP32Servo kullanilmaz:
 //  - kutuphanenin pin izin listesi (GPIO 0'i reddediyor) devre disi kalir
@@ -101,8 +101,8 @@ static const char*   AP_PASS   = "rcplane1234";
 // Kartin SOL pin sirasi ucus tarafi: ESC (25), elevator (26), rudder (27),
 // GND ve 5V ayni sirada; telsiz kablolari sag sirada kaliyor.
 //
-// BESLEME: ayri UBEC yok. ESC'nin BEC cikisi (5V) kartin 5V pinine gelir,
-// servolar oradan beslenir; BEC hattinda 5V-GND arasi kondansator var.
+// BESLEME: ayri UBEC (5V/3A). Cikisi kartin 5V pinine gelir, servolar oradan
+// beslenir; hatta 5V-GND arasi kondansator var. ESC'nin lineer BEC'i kapali.
 //
 // ESC GPIO25'te, sinyal ile GND arasinda 10k var: boot sirasinda pin yuksek
 // empedansta, pulldown sayesinde ESC cop darbe yerine HIC darbe gormez.
@@ -1452,8 +1452,8 @@ void setup() {
   Serial.printf("[BOOT] Reset sebebi: %s (kod %d)\n", sebepAd, (int)sebep);
   if (sebep == ESP_RST_BROWNOUT) {
     Serial.println("[BOOT] !! BESLEME COKMESI. Servo/ESC akimi karti dusuruyor.");
-    Serial.println("[BOOT]    BEC hattindaki kondansatoru ve GND baglantisini kontrol et;");
-    Serial.println("[BOOT]    surerse servolari ayri UBEC'e al. Bu bir YAZILIM sorunu degil.");
+    Serial.println("[BOOT]    5V hattindaki kondansatoru ve GND baglantisini kontrol et;");
+    Serial.println("[BOOT]    surerse UBEC akimina ve kablo kesitine bak. YAZILIM sorunu degil.");
   }
 
   // Kalibrasyon ayarlarini once yukle: LEDC kanallari ilk degerlerini

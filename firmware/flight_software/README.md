@@ -54,13 +54,13 @@ bootloader on every power-up, which is why the ESC moved off it), **14** (PWMs d
 first cannot move the radio. SPI runs at **4 MHz** — the same value the ground station
 settled on, so the two cannot drift apart.
 
-**Power.** No separate UBEC: the ESC's BEC output feeds the board's 5 V pin, and both servos
-take their 5 V from there. A capacitor sits across 5 V–GND on that BEC line. nRF24 on 3.3 V,
-with a 10 µF capacitor at its pins. Grounds common.
+**Power.** The board and both servos run from a **separate 5 V / 3 A UBEC** on the flight
+battery; the ESC's own linear BEC is disabled. A capacitor sits across 5 V–GND on that rail.
+nRF24 on 3.3 V, with a 10 µF capacitor at its pins. Grounds common.
 
 The boot log prints the reset reason. If you see `BROWNOUT` — especially *again* after
-powering the motor — the problem is supply, not software: check the BEC-line capacitor and
-the ground first, and give the servos their own UBEC if it persists.
+powering the motor — the problem is supply, not software: check the capacitor on the 5 V
+rail and the ground first, then the UBEC's current rating and the wire gauge feeding it.
 
 ---
 

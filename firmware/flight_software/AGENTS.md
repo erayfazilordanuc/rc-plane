@@ -26,7 +26,7 @@ istasyonuna güvenmeyen kendi failsafe mantığını çalıştırıyor.
 | Aileron sol / sağ | 32 / 33 | Firmware'de hazır; bu uçakta bağlı değil, nötrde bekler |
 | nRF24 SCK / MISO / MOSI | 18 / 19 / 23 | Kumandayla aynı (VSPI) |
 | nRF24 CSN / CE | 5 / 4 | Kumandayla aynı |
-| Besleme | 5V pini | Ayrı UBEC yok: ESC BEC → kart 5V → servolar, hatta kondansatör |
+| Besleme | 5V pini | Ayrı UBEC (5V/3A) → kart 5V → servolar, hatta kondansatör; ESC'nin BEC'i kapalı |
 
 Kaçınılan pinler: **0, 2, 12, 15** (strapping), **14** (boot'ta PWM), **6–11**
 (flash — kartta `D0–D3`, `CMD`, `CLK`; `D2` GPIO2 değil), **1, 3** (UART0).
