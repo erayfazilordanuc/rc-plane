@@ -39,7 +39,7 @@ Tüm ölçüler mm. Sıfır noktası firewall.
 |---|---|
 | Uzunluk | 1050 |
 | Kesit | 75 × 80 |
-| Kuyruk | Yan görünüşte 45 mm'ye daralıyor, genişlik sabit 75 |
+| Kuyruk | Üst kenar düz; yükseklik alttan daralarak 45 mm'ye iniyor, genişlik sabit 75 |
 | Firewall | 3 mm kontrplak, epoksi, 20 mm yuvaya oturuyor |
 
 - Yan duvar eki **x=400**, üst güverte eki **x=600**. İkisi bilerek aynı istasyona

@@ -4,36 +4,62 @@
   <img src="airframe/plane.jpeg" width="600" alt="The finished aircraft: white foam-board high-wing trainer with a green propeller, dihedral wing and conventional tail">
 </p>
 
-A from-scratch radio control system for a fixed-wing aircraft, built on two ESP32 boards
-instead of a commercial TX/RX pair. There is no hobby transmitter in this project: the
-ground station generates the RC frame itself, and the aircraft decodes it, drives the
-surfaces and reports back — over a **redundant dual radio link** with failsafe logic on
-both ends. The airframe is scratch-built too: a 1.4 m foam-board trainer cut by hand from
-a paper plan.
+A from-scratch radio control system and airframe. There is no hobby transmitter in this
+project: an ESP32 ground station builds the RC frame itself from a phone's touch sticks,
+and an ESP32 in the aircraft decodes it, drives the surfaces and reports back — over a
+**redundant dual radio link** with failsafe logic on both ends. The airframe is a 1.4 m
+foam-board trainer, designed on paper and cut by hand.
 
-I started this because a transmitter and receiver set costs about 5000 TL, and I wanted to
-see whether I could do the radio link myself with two ESP32 boards I already had, using my
-phone as the sticks. That choice decides the rest of the project: if the ground station is
-the transmitter, then arming, failsafe and throttle limits are my problem, not a radio
-manufacturer's.
+It started as a way around a ~5000 TL transmitter/receiver set. But once the ground station
+*is* the transmitter, arming, failsafe and throttle limits become my problem rather than a
+radio manufacturer's — so the interesting part is not that a servo moves, it is everything
+that happens when the link degrades.
 
-So the interesting part of this build is not that it moves a servo. It is everything that
-happens when the link degrades: duplicate suppression, arm interlocks, relink hysteresis
-and independent throttle ceilings on both sides.
+* **Two independent radios, one code path** — nRF24L01+ and ESP-NOW carry the same frame;
+  either alone can fly the aircraft.
+* **Safety enforced on both boards** — arm interlock, two-stage throttle ceiling, 500 ms
+  failsafe, relink hysteresis, browser watchdog.
+* **Phone as transmitter** — WebSocket touch gimbals with no app and no internet, servo
+  calibration over the air, stored in the aircraft's flash.
+* **Tested without hardware** — a Node harness checks the UI's maths against the firmware
+  at 42 000 points before anything is flashed.
 
 <p align="center">
   <img src="airframe/first_flight.webp" width="480" alt="Hand launch on a ploughed field: the aircraft leaves the hand under power, climbs away and flies across the field">
   <br><sub>First field test, 21 September 2026 — hand launch and the first seconds of the flight.</sub>
 </p>
 
-## 🛰️ System Overview
+## 📐 Mechanics
+
+<p align="center">
+  <img src="docs/diagrams/airframe_layout.svg" width="820" alt="Airframe top, side and front views with dimensions: 1400 mm span, 200 mm chord, 1050 mm fuselage, CG 50 mm behind the leading edge">
+</p>
+
+| | |
+|---|---|
+| **Construction** | 5 mm foam board, wooden spar, KFm-2 stepped airfoil, tape hinges |
+| **Wing** | 1400 mm span, 200 mm constant chord, 28 dm², high wing, +1.4° incidence |
+| **Control** | 3 channels — throttle, elevator, rudder; roll from rudder via 10° dihedral |
+| **Tail** | 400 × 150 mm stabiliser (Vh 0.70), 180 mm fin (Vv 0.036) |
+| **CG** | 280 mm from the firewall: 50 mm behind the leading edge (25 %), on the spar line |
+| **Power** | A2212 1000 KV, 10×4.5 prop, 30 A ESC, 3S 2200 mAh 30C |
+| **Weight** | 1105 g ready to fly, 39.5 g/dm² wing loading, thrust/weight ≈ 0.8 |
+
+Tail volumes and CG are calculated, not guessed. Crashes are designed to be
+cheap: the wing sits on **two dowels and rubber bands**, so a hard landing pops it off
+instead of tearing the fuselage, and there is **no landing gear** — hand launch, belly
+landing, sacrificial strip under the nose. The firewall and the ground station enclosure
+are 3D-printed ([`cad/print_files/`](cad/print_files/)).
+
+Every decision, the cut list, the weight budget and how the built aircraft differs from the
+original plan: **[docs/AIRFRAME.md](docs/AIRFRAME.md)** (Turkish).
+
+## 🔌 Electronics
 
 ```
 ┌──────────────────────────────┐            ┌──────────────────────────────┐
 │  GROUND STATION (TX)         │            │  AIRCRAFT (RX)               │
-│  ESP32-WROOM-32              │            │  ESP32 DevKitC (WROOM-32D)   │
-│                              │            │                              │
-│  WiFi AP ──► web UI          │  RcPacket  │  paketIsle()                 │
+│  WiFi AP ──► phone web UI    │  RcPacket  │  paketIsle()                 │
 │  192.168.4.1   ┌──────────┐  │ ══ 50 Hz ═►│  ├─ verify (magic + CRC)     │
 │                │ nRF24L01 │──┼─ 2.508 GHz │  ├─ arm interlock            │
 │                └──────────┘  │            │  ├─ failsafe                 │
@@ -43,255 +69,93 @@ and independent throttle ceilings on both sides.
 └──────────────────────────────┘            └──────────────────────────────┘
 ```
 
-The operator's phone connects to the ground station's own access point and flies the
-aircraft from a browser — **two touch gimbals laid out like a real transmitter**, no
-internet, no pairing app. The ground station turns that into a 12-byte `RcPacket` at
-50 Hz and pushes it over the air.
-
-The airframe is a **3-channel trainer**: throttle, elevator and rudder. There are no
-ailerons — roll comes from rudder via wing dihedral, which is why the spare stick axis is
-drawn as a single-axis slot in the UI rather than being silently dead. The protocol already
-carries a fourth channel: switch Settings to **4 channel** and both sticks become full
-gimbals, and the aircraft drives mirrored aileron servos on GPIO 32/33 — a new wing needs
-no firmware change.
-
-## 📡 Redundant Dual Transport
-
-The same `RcPacket` travels over **two fully independent radio paths**, and either one
-alone is enough to fly:
-
-| | nRF24L01+ | ESP-NOW |
+| | nRF24L01+ PA/LNA | ESP-NOW |
 |---|---|---|
-| Hardware | Separate module, SPI, 7 wires + capacitor | **None** — the chip's own WiFi radio |
+| Hardware | Separate module on VSPI, SMA antenna, `PA_HIGH` | **None** — the ESP32's own WiFi radio |
 | Frequency | 2.508 GHz (channel 108) | 2.412 GHz (WiFi channel 1) |
-| Addressing | `"RCP01"` pipe | Broadcast — no MAC pairing needed |
+| Addressing | `"RCP01"` pipe | Broadcast — no MAC pairing |
 | Telemetry | ACK payload | Separate broadcast frame |
 
-The 96 MHz gap between the two is deliberate — the access point cannot desensitise the
-nRF24 link. Both paths funnel into the same `paketIsle()` entry point on the aircraft, so
-validation, arming and failsafe rules exist in exactly one place and cannot drift apart.
-When a packet arrives twice, the `seq` delta is 0 and the duplicate is dropped: outputs are
-never written twice and telemetry is never sent twice.
+The 96 MHz gap is deliberate, so the access point cannot desensitise the nRF24. The
+redundancy earned its place during bring-up: the nRF24 path was dead for a while (brown-out
+on transmit, and a clone chip silently refusing 250 kbps) and ESP-NOW kept the aircraft
+controllable while that was diagnosed.
 
-This redundancy was not academic. The nRF24 path was dead for a stretch during bring-up
-(brown-out on transmit, and a clone chip silently refusing 250 kbps) — ESP-NOW kept the
-aircraft controllable while that was diagnosed.
-
-## 🛡️ Safety Architecture
-
-Every guard below is enforced **independently on both boards**. Trusting the transmitter's
-limits alone means a corrupted packet or a stale browser tab can spin a propeller.
-
-* **Arm interlock.** The aircraft boots arm-locked and re-locks after every failsafe. It
-  will not arm until it has seen a packet with `ARMED = 0` from the ground station — so a
-  recovering link can never spin the motor on its own; the operator must cycle DISARM → ARM.
-* **Telemetry-gated arming.** The ground station refuses to arm unless fresh telemetry is
-  coming back from the aircraft. The "controller says ARMED but the aircraft never heard it"
-  state is structurally impossible.
-* **Two-stage throttle ceiling.** The ground station scales throttle by a pilot-set limit,
-  and the aircraft clips again against its own stored ceiling. Neither side trusts the
-  other's number; the lower one wins. Both are adjustable from the UI, so bringing a new
-  setup up at 70 % no longer means recompiling.
-* **Failsafe.** No valid packet for 500 ms → throttle to the ESC stop pulse, all surfaces to
-  their calibrated neutral, arm dropped.
-* **Relink hysteresis.** Leaving failsafe requires 10 consecutive valid packets (~200 ms at
-  50 Hz). Recovering on a single packet made the motor stutter every time the link twitched.
-* **Browser watchdog.** The UI pushes stick positions at 20 Hz, and that push *is* the
-  watchdog feed. Close the tab, background the app or walk out of WiFi range and the ground
-  station disarms within 1 second, with the aircraft's own failsafe firing 500 ms later.
-* **Calibration is motor-safe.** Entering servo calibration is refused while armed, and the
-  mode itself makes arming impossible and pins the ESC at its stop pulse. Endpoint tests
-  return to neutral after 4 seconds, so a servo cannot sit stalled against a linkage stop.
-* **CRC-8 on every frame**, on top of the nRF24's hardware CRC-16, plus a protocol version
-  nibble so mismatched firmware cannot half-work.
-
-## ✈️ Airframe
-
-<p align="center">
-  <img src="docs/diagrams/airframe_layout.svg" width="820" alt="Airframe top, side and front views with dimensions: 1400 mm span, 200 mm chord, 1050 mm fuselage, CG 50 mm behind the leading edge">
-</p>
-
-| | |
-|---|---|
-| **Construction** | 5 mm foam board, wooden spar, KFm-2 stepped airfoil, tape hinges |
-| **Wing** | 1400 mm span, 200 mm constant chord, 28 dm², high wing on rubber bands |
-| **Roll stability** | 10° dihedral, one break at the centre — roll comes from rudder |
-| **Tail** | 400 × 150 mm stabiliser (Vh 0.70), 180 mm fin (Vv 0.036) |
-| **CG** | 280 mm from the firewall: 50 mm behind the leading edge, on the spar line |
-| **Power** | A2212 1000 KV, 10×4.5 prop, 30 A ESC, 3S 2200 mAh 30C |
-| **Weight** | 1105 g ready to fly, 39.5 g/dm² wing loading, thrust/weight ≈ 0.8 |
-
-Two details that keep breaking things cheap: the wing is held on by **two dowels and rubber
-bands**, so a hard landing pops it off instead of tearing the fuselage, and there is **no
-landing gear** — hand launch, belly landing, with a sacrificial strip taped under the nose.
-
-Every mechanical decision, and how the built aircraft differs from the original plan, is in
-**[docs/AIRFRAME.md](docs/AIRFRAME.md)** (Turkish).
-
-## ⚡ Hardware
-
-Two boards, two jobs.
+### Ground station
 
 <table>
 <tr>
-<td width="50%"><img src="avionics/flight_circuit.jpeg" alt="Electronics bay inside the fuselage: ESP32 DevKitC on a breadboard, nRF24 module wrapped in tape with its capacitor, wiring running to the servos"></td>
+<td width="50%"><img src="avionics/ground_station_gateway_box.jpeg" alt="Closed ground station: 3D-printed enclosure with antenna pass-through and power switch"></td>
 <td width="50%"><img src="avionics/ground_station_gateway_circuit.jpeg" alt="Ground station opened up: ESP32-WROOM-32, nRF24L01+ PA/LNA with an SMA antenna, battery pack with a switch, next to its 3D-printed housing"></td>
-</tr>
-<tr>
-<td><b>1 · Aircraft</b> — inside the fuselage. Listens on both radios, validates every frame,
-runs it through the stored calibration curve and drives the ESC and two servos. Holds the
-failsafe, the arm lock and its own throttle ceiling, and sends telemetry back.</td>
-<td><b>2 · Ground station</b> — in your hand. Raises the WiFi access point, serves the flight
-interface to the phone, turns stick positions into a 12-byte frame 50 times a second and
-reads telemetry back. This board <i>is</i> the transmitter.</td>
 </tr>
 </table>
 
-**Aircraft — ESP32 DevKitC (38-pin, WROOM-32D).** The first bench prototype ran on an
-ESP32-C3 SuperMini; the aircraft that flies carries a classic ESP32. Both ends now share
-one radio pin map (VSPI on 18/19/23, CSN 5, CE 4), so a wiring fix on one board is a
-wiring fix on the other.
-
-**Ground station — ESP32-WROOM-32.** Runs the WiFi access point, the web server and the
-radio at the same time. The dual-core part keeps HTTP work from stalling the 50 Hz frame.
-
-**nRF24L01+ PA/LNA with an external SMA antenna at both ends**, running at `RF24_PA_HIGH`.
-If a module resets under load, check its capacitor and supply before suspecting anything
-else — the firmware counts every recovery (`kurt=N` / `kurtarma=N`) so a brown-out cannot
-hide.
-
-**Power.** 3S 2200 mAh 30C LiPo → 30 A ESC → A2212 1000 KV outrunner, under 25 A at full
-throttle. The ESC's linear BEC is disabled: the board and both servos run from a **separate
-5 V / 3 A UBEC** on the same battery, with a bulk capacitor across the rail. A 9 g servo
-pulls ~700 mA on a step input, and a linear BEC dropping 12 V to 5 V does it as heat — that
-is why it is not carrying the flight controller. Grounds are common. The ground station runs
-off an 18650 pack in a 3D-printed enclosure.
-
-> ⚠️ **The nRF24 needs a 10–100 µF capacitor across VCC–GND, as close to the module pins as
-> possible.** Without it the module browns out during transmit and `radio.begin()` succeeds
-> only sometimes — the most misleading failure mode in this whole build.
->
-> ⚠️ **nRF24 VCC is 3.3 V, never 5 V.** The header is 2×4 with GND on pin 1 and VCC on pin 2;
-> it is very easy to be one row off, and reversed supply kills the module.
-
-### Wiring
-
-<p align="center">
-  <img src="docs/diagrams/aircraft_wiring.svg" width="880" alt="Aircraft wiring diagram: ESC on GPIO25 with a 10k pull-down, elevator servo on GPIO26, rudder servo on GPIO27 through a servo rail; ESC BEC 5 V to the rail and board; nRF24 on VSPI with a capacitor">
-</p>
+The handheld transmitter: an ESP32-WROOM-32 and the nRF24 in a 3D-printed, 18650-powered
+box. Runs the WiFi access point, the web server and the 50 Hz radio frame at once — the
+dual core keeps HTTP work from stalling the frame. This board *is* the transmitter.
 
 <p align="center">
   <img src="docs/diagrams/ground_station_wiring.svg" width="660" alt="Ground station wiring diagram: nRF24L01+ on D23 MOSI, D19 MISO, D18 SCK, D5 CSN, D4 CE, 3V3 and GND with a capacitor at the module">
 </p>
 
-| Aircraft (ESP32 DevKitC) | GPIO | | Ground station (ESP32) | GPIO |
-|---|---|---|---|---|
-| ESC signal | 25 *(10 k to GND)* | | nRF24 CE | 4 |
-| Elevator | 26 | | nRF24 CSN | 5 |
-| Rudder | 27 | | nRF24 SCK | 18 |
-| nRF24 SCK / MISO / MOSI | 18 / 19 / 23 | | nRF24 MISO | 19 |
-| nRF24 CSN / CE | 5 / 4 | | nRF24 MOSI | 23 |
+Radio pins: SCK 18, MISO 19, MOSI 23, CSN 5, CE 4 — the same map as the aircraft, so a wiring
+fix on one board is a wiring fix on the other.
 
-On the classic ESP32, GPIO 0, 2, 12 and 15 are strapping pins — a pull-down on GPIO0 drops
-the board into the bootloader on every power-up, which is why the ESC left GPIO0 when the
-aircraft moved off the C3. GPIO 14 pulses during boot and 6–11 belong to the internal flash
-(silkscreened `D0–D3`, `CMD`, `CLK` — `D2` is *not* GPIO2), so none of them are used. The
-10 k on the ESC line keeps the pin from floating garbage into the ESC while the board boots.
-GPIO 32/33 still carry mirrored aileron outputs in firmware; nothing is connected to them on
-this airframe.
+### Avionics
 
-The diagrams are generated by [`docs/diagrams/generate.py`](docs/diagrams/generate.py).
-Wire-by-wire tables with cable colours live in each firmware's `docs/kablolama.html` and in
-**[docs/RF_PROTOCOL.md](docs/RF_PROTOCOL.md)**.
+<table>
+<tr>
+<td width="50%"><img src="avionics/flight_circuit_zoomed.jpeg" alt="Electronics bay from above, installed in the fuselage: ESP32 DevKitC on a breadboard, nRF24 module wrapped in tape with its capacitor, wiring running out to the servos"></td>
+<td width="50%"><img src="avionics/esp32d_circuit_zoomed.jpeg" alt="Close-up of the flight controller: ESP32-32D DevKitC on a breadboard with the bulk capacitor and jumper wires to the radio, ESC and servos"></td>
+</tr>
+</table>
 
-## 💻 Firmware
+The flight controller: ESP32 DevKitC (WROOM-32D) inside the fuselage. Listens on both
+radios, validates every frame, applies the stored calibration and drives the ESC and two
+servos. Owns the failsafe, the arm lock and its own throttle ceiling, and sends telemetry
+back.
 
-* **Direct LEDC servo driving — no `ESP32Servo`.** The library's pin allowlist rejects GPIO0,
-  and its degree↔µs conversion shifted the neutral point. Writing LEDC duty directly means
-  the firmware speaks the same unit as the wire protocol: microseconds, end to end, with no
-  conversion anywhere.
-* **The 14-bit C3 trap.** The ESP32-C3's LEDC timer maxes out at 14 bits, while nearly every
-  example online uses 16 (valid on the classic ESP32). Copy those verbatim and `ledcSetup()`
-  silently returns 0, no PWM is generated at all, and a multimeter reads 0 V on the pin.
-  The firmware started on a C3 and still runs at 14 bits: @ 50 Hz that is ~1.22 µs
-  resolution — well past what RC needs — and it keeps working if the board ever goes back.
-* **Non-blocking transmit.** The ground station uses `startWrite()` plus STATUS polling rather
-  than `radio.write()`. Blocking writes burn ~12 ms of the 20 ms budget when the link drops,
-  making the UI sluggish exactly when control matters most. A transmit exceeding 15 ms is
-  aborted and the TX FIFO flushed.
-* **Broadcast telemetry, and why not unicast.** Unicast was tried and measured out:
-  `ack=0 / nack=57` — not one of 57 sends per second was acknowledged, then
-  `ESP_ERR_ESPNOW_NO_MEM`. The aircraft's STA is not associated with the ground station's
-  AP, so its unicast frames get no MAC-layer ACK; ESP-NOW retries, the send queue fills,
-  and telemetry stops entirely. Broadcast frames expect no ACK and never fill the queue,
-  and the payload carries its own magic byte and CRC-8, so nothing is lost by not being
-  addressed.
-* **Decoupled telemetry cadence.** Telemetry refreshes every 100 ms regardless of packet
-  arrival, so duplicate-suppression gaps can't be misread as "the aircraft is not answering".
-* **Servo calibration over the air, stored in NVS.** Direction, sub-trim and independent
-  per-side endpoints live in the aircraft's flash rather than in a `#define`. They survive a
-  reset, they can be set with the receiver buried in a fuselage and no USB attached, and
-  failsafe neutral becomes the *calibrated* neutral instead of a hardcoded 1500 µs. Commands
-  are retransmitted until the aircraft acknowledges them, and every value on screen is read
-  back from the aircraft — you see what it applied, not what was sent.
-* **ESC throttle range calibration**, from the serial port (`k` within 5 s of boot, then `e`
-  to confirm each step) or from the UI behind a prop-removed confirmation. An uncalibrated
-  ESC can still read 1200 µs as stop — the usual cause of "throttle is going out but the
-  motor won't turn". The routine deliberately exceeds the throttle ceiling, so it is never
-  reachable from flight code, and a single stray byte on the UART can never reach full
-  throttle.
-* **A dependency-free WebSocket server** (`include/mini_ws.h`, SHA-1 and base64 included).
-  `WebServer` stamps `Connection: close` on every response, so 20 Hz stick updates meant a
-  fresh TCP handshake per frame and visibly jittery surfaces. Sends are gated behind a
-  zero-timeout `select()`: `WiFiClient::write()` can block for ~10 s on a stalled socket,
-  and the flight loop must never be the thing that waits. The page falls back to HTTP
-  polling if the socket cannot be established.
-* **Self-healing radio.** Both sides retry `radio.begin()` every 3 s and report link state
-  from a live register read, so a wire reseated mid-session recovers without a reset.
+**Power.** 3S LiPo → 30 A ESC → A2212, under 25 A at full throttle. The ESC's linear BEC is
+disabled; the board and servos run from a **separate 5 V / 3 A UBEC** with a bulk capacitor
+across the rail — a 9 g servo pulls ~700 mA on a step input, and a linear BEC dropping
+12 V to 5 V turns that into heat right next to the flight controller.
 
-## 🚀 Getting Started
+<p align="center">
+  <img src="docs/diagrams/aircraft_wiring.svg" width="880" alt="Aircraft wiring diagram: ESC on GPIO25 with a 10k pull-down, elevator servo on GPIO26, rudder servo on GPIO27 through a servo rail; a separate 5 V UBEC feeds the rail and board with the ESC's BEC disabled; nRF24 on VSPI with a capacitor">
+</p>
 
-### Prerequisites
-* [PlatformIO](https://platformio.org/)
-* Libraries are pulled automatically: `nrf24/RF24@^1.4.11`
-* Optional: Node 24+ and Python 3.11 for the UI test harness in `firmware/tools/`
+| Function | GPIO |
+|---|---|
+| ESC signal | 25 *(10 k to GND)* |
+| Elevator / Rudder | 26 / 27 |
+| nRF24 SCK / MISO / MOSI | 18 / 19 / 23 |
+| nRF24 CSN / CE | 5 / 4 |
 
-### Build & flash
+Strapping pins (0, 2, 12, 15), the boot-pulsing GPIO 14 and the flash pins (6–11) are all
+avoided; the 10 k keeps the ESC line quiet while the board boots. GPIO 32/33 carry mirrored
+aileron outputs for a future 4-channel wing.
 
-```bash
-git clone https://github.com/erayfazilordanuc/rc-plane.git
-cd rc-plane
+> ⚠️ **nRF24: 3.3 V only, and a 10–100 µF capacitor right at the module pins.** Without it
+> the module browns out on transmit and `radio.begin()` succeeds only sometimes — the most
+> misleading failure in this build. The firmware counts every radio recovery, so a
+> brown-out cannot hide.
 
-# Aircraft
-cd firmware/flight_software
-pio run -t upload -t monitor
+Cable-colour wiring tables: each firmware's `docs/kablolama.html` and
+**[docs/RF_PROTOCOL.md](docs/RF_PROTOCOL.md)**. Diagrams are generated by
+[`docs/diagrams/generate.py`](docs/diagrams/generate.py).
 
-# Ground station
-cd ../controller_software
-pio run -t upload -t monitor
-```
+<details>
+<summary>Earlier prototype: ESP32-C3 SuperMini on the bench</summary>
+<br>
+<p align="center">
+  <img src="avionics/legacy/esp32c3_full_flight_circuit.jpeg" width="500" alt="Bench prototype: ESP32-C3 SuperMini on a mini breadboard, nRF24L01+ with antenna, 3S LiPo, ESC, A2212 motor and servos laid out on a desk">
+</p>
+</details>
 
-Both `platformio.ini` files **pin their serial port explicitly** — `COM5` for the ground
-station's CP210x bridge, `COM6` for the aircraft. Both boards enumerate through a USB
-bridge and look alike in Device Manager, and without a pinned port PlatformIO takes the
-first one in the list and flashes the wrong board. Check yours with `pio device list`,
-one board attached at a time, and update the lines.
+## 💻 Software
 
-### Fly it
-
-1. Power the ground station and connect a phone to **`RC-Plane-TX`** / `rcplane1234`.
-2. Open **`http://192.168.4.1`**.
-3. Two gimbals in the **bottom corners**, each at least 140 dp on a side. A 3-channel
-   airframe has no ailerons, so one horizontal axis is always spare and three layouts pick
-   where it sits: **Mode 1** (left: rudder + elevator, right: throttle), **Mode 2**
-   — the default — (left: rudder + throttle, right: elevator), and **3 CH**
-   (left: throttle only, right: rudder + elevator). Elevator and rudder spring back to
-   centre on release; throttle stays where you left it, exactly like a ratcheted stick.
-   With **4 channel** selected, Mode 1 and Mode 2 become full two-gimbal layouts and 3 CH
-   disappears, since no axis is spare any more.
-4. Calibrate the servos before the first flight: **Settings → enter calibration**, set
-   direction, neutral and endpoints per surface, sweep to confirm nothing binds, then
-   **save to the aircraft**.
+Two PlatformIO firmwares sharing one byte-identical protocol header (12-byte `RcPacket`,
+CRC-8 on top of the nRF24's CRC-16, version nibble so mismatched firmware cannot half-work).
 
 <p align="center">
   <picture>
@@ -302,7 +166,7 @@ one board attached at a time, and update the lines.
 </p>
 
 <details>
-<summary>4-channel layout (Settings → 4 channel) and the settings screen</summary>
+<summary>4-channel layout and the settings screen</summary>
 <br>
 <p align="center">
   <picture>
@@ -316,115 +180,108 @@ one board attached at a time, and update the lines.
 </p>
 </details>
 
-The throttle stick cannot jump. Axes map absolutely — stick position *is* the channel
-value — but the throttle axis only engages when the touch starts on the knob, so tapping
-the top of the well does nothing. Spring-loaded axes need no such guard; they re-centre on
-release.
+### Safety — enforced independently on both boards
 
-Slide a finger off the well and the value **freezes** rather than tracking a clamped
-edge — a stick that keeps moving while your finger is somewhere else is a lie. The well
-border turns amber while frozen, and spring-loaded axes still re-centre on release.
-Multi-touch is per gimbal via pointer capture, so "released" and "dragged outside" never
-get confused. A USB gamepad works too, through the Gamepad API.
+* **Arm interlock.** The aircraft boots locked and re-locks after every failsafe; it arms
+  only after seeing `ARMED = 0` first, so a recovering link can never spin the motor.
+* **Telemetry-gated arming.** The ground station will not arm without fresh telemetry —
+  "controller says ARMED, aircraft never heard it" cannot happen.
+* **Two-stage throttle ceiling.** Both sides clip against their own stored limit; the lower
+  one wins. Set from the UI, no recompiling.
+* **Failsafe.** 500 ms without a valid packet → ESC stop pulse, surfaces to *calibrated*
+  neutral, arm dropped. Leaving it takes 10 consecutive good packets, so a twitching link
+  doesn't stutter the motor.
+* **Browser watchdog.** The 20 Hz stick push is the watchdog feed: close the tab or walk out
+  of WiFi range and the ground station disarms within 1 s.
+* **Duplicate suppression.** Both radios feed one `paketIsle()`; a packet seen twice is
+  dropped by its `seq`, so outputs and telemetry are never doubled and the rules cannot drift
+  apart between paths.
 
-Stick data is sent **on the touch event itself**, not on a timer, so the UI adds no
-buffering of its own; end-to-end latency is essentially the radio's own 20 ms frame.
-A screen Wake Lock keeps the display on, and pulling down the notification shade does not
-disturb a single channel. The flight screen carries no animation, transition, gradient or
-shadow, and every colour pair on it clears WCAG AAA against its background so it stays
-readable in direct sun.
+### Engineering notes
 
-Keyboard, for bench work: `W`/`S` throttle, arrows elevator, `A`/`D` rudder, `Space`
-emergency stop, `X` throttle cut.
+* **Direct LEDC servo output, no `ESP32Servo`** — microseconds end to end, same unit as the
+  wire protocol. Runs at 14-bit resolution (~1.22 µs) because the C3 it started on silently
+  fails at the 16 bits most examples use.
+* **Non-blocking transmit** — `startWrite()` plus STATUS polling instead of `radio.write()`,
+  which burns ~12 ms of the 20 ms frame when the link drops.
+* **Broadcast telemetry, measured** — unicast gave `ack=0 / nack=57` and then
+  `ESP_ERR_ESPNOW_NO_MEM`, because the aircraft is not associated with the AP. Broadcast
+  needs no ACK; the payload carries its own magic byte and CRC.
+* **Dependency-free WebSocket server** (`mini_ws.h`, SHA-1 and base64 included) —
+  `WebServer` closes every connection, which made 20 Hz sticks jitter. Sends are gated by a
+  zero-timeout `select()` so the flight loop never waits on a stalled socket.
+* **Over-the-air servo calibration in NVS** — direction, sub-trim and per-side endpoints,
+  retransmitted until acknowledged and read back from the aircraft, so the screen shows what
+  was *applied*.
+* **Honest sticks** — throttle engages only from the knob (no jumps), a finger sliding off
+  the well freezes the value instead of tracking the edge, and every colour pair clears WCAG
+  AAA for direct sun. USB gamepads work via the Gamepad API.
+* **Self-healing radio** — `radio.begin()` retries every 3 s from a live register read, so a
+  reseated wire recovers without a reset.
 
-The pre-flight check list in Settings shows exactly what is blocking ARM. **Remove the
-propeller for every bench test.**
-
-## 🔧 Diagnostics & Tests
-
-Two extra PlatformIO environments exist for isolating faults:
-
-```bash
-# Raw-SPI nRF24 diagnosis: shorts, MISO drive, pin-order permutations, speed sweep
-cd firmware/controller_software
-pio run -e rfdiag -t upload -t monitor
-
-# Servo/ESC bench: no radio at all, drive the outputs from the serial port
-cd firmware/flight_software
-pio run -e bench -t upload -t monitor
-```
-
-`rfdiag` bypasses the RF24 library entirely and brute-forces all 12 SCK/MISO/MOSI and CE/CSN
-combinations, so it reports the correct wiring order if the wires got swapped. If the
-registers it reads are bit-shifted copies of each other, the MISO line is floating and the
-module is not answering at all.
-
-The phone interface has a hardware-free test harness that reads the firmware sources
-directly:
+### Testing & diagnostics
 
 ```bash
-cd firmware
-node tools/run_all.mjs
+cd firmware && node tools/run_all.mjs                       # UI harness, no hardware
+cd controller_software && pio run -e rfdiag -t upload -t monitor   # raw-SPI nRF24 diagnosis
+cd ../flight_software  && pio run -e bench  -t upload -t monitor   # servos/ESC from serial, no radio
 ```
 
-It checks the stick maths, that the UI's throttle formula matches the firmware's at 42 000
-points (the ARM threshold depends on it), that the page's JavaScript runs start to finish
-against a fake DOM, WCAG contrast in both themes, and that every `#id` the script looks up
-exists in the HTML.
+The harness reads the firmware sources directly: stick maths, UI vs firmware throttle
+formula at 42 000 points (the ARM threshold depends on it), the page's JavaScript against a
+fake DOM, WCAG contrast in both themes, every `#id` present. `rfdiag` bypasses RF24 and
+brute-forces all 12 pin-order combinations to find swapped wires.
+[`sim_middleware`](firmware/sim_middleware/) turns the phone UI into a vJoy joystick for
+RealFlight practice with the same controls.
 
-**Simulator practice.** [`firmware/sim_middleware`](firmware/sim_middleware/) turns the same
-phone interface into a virtual USB joystick (vJoy) on a PC, so RealFlight and similar
-simulators can be flown with exactly the controls used in the field.
+## Getting Started
 
-## 📂 Directory Structure
+**Needs:** [PlatformIO](https://platformio.org/) (RF24 is pulled automatically). Optional:
+Node 24+ and Python 3.11 for the test harness.
 
-```
-airframe/           photos of the aircraft and the first flight
-avionics/           electronics photos; legacy/ keeps the ESP32-C3 bench prototype
-cad/print_files/    STLs: ground station housing and lid, firewall
-docs/
-  RF_PROTOCOL.md    radio protocol report: packet layout, failsafe, wiring, bring-up (Turkish)
-  AIRFRAME.md       airframe build plan: dimensions, cut list, weight budget (Turkish)
-  diagrams/         wiring and airframe SVGs + the script that generates them
-  images/           interface screenshots
-firmware/
-  controller_software/   ground station: WiFi AP, phone UI, 50 Hz frame builder, RF diagnostics
-  flight_software/       aircraft: dual-radio receive, arm interlocks, failsafe, NVS calibration
-  tools/                 UI test harness (node tools/run_all.mjs)
-  sim_middleware/        phone UI → vJoy bridge for PC flight simulators (Python)
+```bash
+git clone https://github.com/erayfazilordanuc/rc-plane.git
+cd rc-plane/firmware/flight_software     && pio run -t upload -t monitor   # aircraft
+cd ../controller_software                && pio run -t upload -t monitor   # ground station
 ```
 
-Each firmware has its own README with the wiring, the design decisions and the log format:
-**[ground station](firmware/controller_software/)** · **[aircraft](firmware/flight_software/)**.
+Both `platformio.ini` files pin their serial port (`COM5` ground station, `COM6` aircraft)
+because the two USB bridges look alike and PlatformIO would otherwise flash the wrong board.
+Check yours with `pio device list`, one board at a time.
 
-<p align="center">
-  <img src="avionics/ground_station_gateway_box.jpeg" width="420" alt="3D-printed ground station enclosure with antenna pass-through and power switch">
-</p>
+1. Power the ground station, join **`RC-Plane-TX`** / `rcplane1234` from a phone and open
+   **`http://192.168.4.1`**.
+2. Pick a layout — **Mode 1**, **Mode 2** (default) or **3 CH**. Elevator and rudder spring
+   back; throttle stays put like a ratcheted stick.
+3. **Settings → calibration:** set direction, neutral and endpoints per surface, sweep,
+   **save to the aircraft**.
+4. The pre-flight checklist shows exactly what is blocking ARM. **Remove the propeller for
+   every bench test.**
 
-> The engineering deep-dives in `docs/`, the per-firmware wiring pages and the source
-> comments are written in Turkish.
+Bench keys: `W`/`S` throttle, arrows elevator, `A`/`D` rudder, `Space` emergency stop,
+`X` throttle cut.
 
-<details>
-<summary>Earlier prototype: ESP32-C3 SuperMini on the bench</summary>
-<br>
-<p align="center">
-  <img src="avionics/legacy/esp32c3_full_flight_circuit.jpeg" width="500" alt="Bench prototype: ESP32-C3 SuperMini on a mini breadboard, nRF24L01+ with antenna, 3S LiPo, ESC, A2212 motor and servos laid out on a desk">
-</p>
-</details>
+```
+airframe/  avionics/  cad/print_files/   photos, printable STLs
+docs/       RF_PROTOCOL.md · AIRFRAME.md · ROADMAP.md (Turkish) · diagrams/ · images/
+firmware/   controller_software/ · flight_software/ · tools/ · sim_middleware/
+```
 
-## 🧭 Status & Next Steps
+Per-firmware READMEs: **[ground station](firmware/controller_software/)** ·
+**[aircraft](firmware/flight_software/)**. Deep-dives in `docs/` and source comments are in
+Turkish.
 
-The link, the web UI, failsafe and the full actuation chain are installed in the airframe.
+## Status & Next Steps
+
 First field tests took place on **21 September 2026**: hand launches from a ploughed field,
-the best of them about ten seconds in the air (clip at the top). Open items:
+the best of them about ten seconds in the air (clip at the top).
 
-* **Trim and CG** — tune from the first flights. The aircraft is weighed (1105 g) but the
-  balance point has not been re-measured since the wing moved forward to 230 mm.
+* **CG and trim** — re-measure the balance point since the wing moved to 230 mm, trim from
+  flight.
 * **Soldered board** — the electronics still sit on a breadboard inside the fuselage.
-* **Battery telemetry** — `bataryaOku()` returns 0 today; the ground station's voltage field
-  lights up as soon as a divider is wired to an ADC1 pin.
-* **Physical sticks** — a gimbal-based transmitter to replace the browser UI as primary control.
+* **Battery telemetry** — `bataryaOku()` returns 0 today; needs a divider on an ADC1 pin.
+* **Physical sticks** — a gimbal transmitter to replace the browser UI as primary control.
 * **Range testing** and PA level tuning under real separation.
 
-The longer plan — link authentication, range characterisation, flight logging, an IMU and
-stabilisation — is in **[docs/ROADMAP.md](docs/ROADMAP.md)** (Turkish).
+Longer plan — link authentication, flight logging, IMU stabilisation:
+**[docs/ROADMAP.md](docs/ROADMAP.md)** (Turkish).

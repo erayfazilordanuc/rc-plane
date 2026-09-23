@@ -110,10 +110,10 @@
 
 <text class="sans s12 b mute" x="640" y="98">SIDE VIEW</text>
 
-<path class="fill2" d="M680 190 H974.0 V177.4 L792.0 167.6 H680 Z"/>
+<path class="fill2" d="M680 167.6 H974.0 V180.2 L792.0 190 H680 Z"/>
 <path class="outline" d="M744.4 167.6 V162.0 H772.4 V164.79999999999998 H800.4 V167.6 Z"/>
-<rect class="outline" x="932.0" y="175.4" width="42.0" height="2"/>
-<path class="outline" d="M934.8 175.4 H974.0 V125.0 H946.0 Z"/>
+<rect class="outline" x="932.0" y="165.6" width="42.0" height="2"/>
+<path class="outline" d="M934.8 165.6 H974.0 V115.2 H946.0 Z"/>
 <rect class="box" x="666" y="172" width="14" height="14" rx="2"/>
 <path class="prop" d="M662 143.4 V214.6"/>
 <path class="thin" style="stroke-width:3" d="M680 193 H736.0"/>
@@ -125,13 +125,13 @@
 
 <text class="sans s11 mute" x="772.4" y="153.6" text-anchor="middle">high wing · +1.4° incidence</text>
 
-<text class="sans s11 mute" x="974.0" y="115.0" text-anchor="end">stab 0° · decalage 1.4°</text>
+<text class="sans s11 mute" x="974.0" y="105.2" text-anchor="end">stab 0° · decalage 1.4°</text>
 
 <text class="sans s12 b mute" x="640" y="258">FRONT VIEW</text>
 
 <circle cx="820" cy="326.8" r="27.9" fill="none" class="ext"/>
-<path class="thin" d="M820 325.7 V286.1"/>
-<path class="thin" d="M776.0 325.7 H864.0"/>
+<path class="thin" d="M820 318 V278.4"/>
+<path class="thin" d="M776.0 318 H864.0"/>
 <rect class="fill2" x="811.8" y="318" width="16.5" height="17.6"/>
 <polyline fill="none" class="thin" style="stroke-width:5;stroke-linejoin:round" points="666.0,290.9 820,318 974.0,290.9"/>
 <text class="sans s12 mute" x="820" y="368" text-anchor="middle">10° dihedral, one break at the centre · roll comes from rudder</text>

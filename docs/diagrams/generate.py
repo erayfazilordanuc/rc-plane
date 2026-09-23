@@ -438,8 +438,10 @@ def airframe():
     t = 0.28
     sx, base = 680, 190
     SX = lambda mm: round(sx + mm * t, 1)
-    top_f, top_t = round(base - 80 * t, 1), round(base - 45 * t, 1)
-    b.append(f'<path class="fill2" d="M{sx} {base} H{SX(1050)} V{top_t} L{SX(400)} {top_f} H{sx} Z"/>')
+    # ust kenar duz; govde kuyruga dogru alttan daraliyor (80 -> 45)
+    top_f = top_t = round(base - 80 * t, 1)
+    bot_t = round(top_f + 45 * t, 1)
+    b.append(f'<path class="fill2" d="M{sx} {top_f} H{SX(1050)} V{bot_t} L{SX(400)} {base} H{sx} Z"/>')
     # KFm-2: on yari kalin, arka yari ince
     b.append(f'<path class="outline" d="M{SX(230)} {top_f} V{top_f-5.6} H{SX(330)} V{top_f-2.8} H{SX(430)} V{top_f} Z"/>')
     b.append(f'<rect class="outline" x="{SX(900)}" y="{top_t-2}" width="{round(150*t,1)}" height="2"/>')
@@ -460,7 +462,7 @@ def airframe():
     c0, wy = 820, 318
     FX = lambda mm: round(c0 + mm * f, 1)
     tip = round(wy - 123 * f, 1)   # 10 derece, uc yukselmesi 700*tan10
-    tail_top = round(wy + 80 * f - 45 * f, 1)
+    tail_top = wy   # ust kenar duz: kuyruk yuzeyleri govde ustu hizasinda
     b.append(f'<circle cx="{c0}" cy="{round(wy+40*f,1)}" r="{round(127*f,1)}" fill="none" class="ext"/>')
     b.append(f'<path class="thin" d="M{c0} {tail_top} V{round(tail_top-180*f,1)}"/>')
     b.append(f'<path class="thin" d="M{FX(-200)} {tail_top} H{FX(200)}"/>')
