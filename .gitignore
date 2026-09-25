@@ -52,3 +52,5 @@ tmp/
 *.bak
 *.orig
 *.rej
+
+notes*

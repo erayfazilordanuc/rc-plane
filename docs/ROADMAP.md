@@ -98,7 +98,8 @@ gör → yüksek irtifada, geniş alanda, moda geçip hemen manuele dönerek den
 ## 6. Donanımın olgunlaşması
 
 - Breadboard → delikli kart, sonra **KiCad** ile PCB (`hardware/kicad/`).
-- Servolara ayrı UBEC (BEC hattındaki kondansatör bir yamadır, çözüm değil).
+- ~~Servolara ayrı UBEC~~ — yapıldı: servolar hareket edince kart çöküyordu, ayrı
+  5 V / 3 A UBEC ile bitti.
 - Konnektörler (servo ve besleme ayrı), titreşim yalıtımı, anten yerleşimi ve gövde
   içinde kablo düzeni.
 - Uçuş öncesi kontrol listesine "kablo çekiştirme testi" ekle.

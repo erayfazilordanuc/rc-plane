@@ -62,9 +62,26 @@ STYLE = """
 """
 
 
-def svg(w, h, body, label):
+# Yalnizca flight_performance.svg kullanir; diger SVG'lere girmesin.
+CHART_STYLE = """
+<style>
+  .ln{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+  .t100{stroke:#104281} .t80{stroke:#2a78d6} .t70{stroke:#6da7ec} .drag{stroke:#eb6834}
+  .glide{stroke:#59636e;stroke-dasharray:6 5} .band{fill:#eb6834;fill-opacity:.16}
+  .stallz{fill:#59636e;fill-opacity:.09} .axis{fill:none;stroke:#8c959f;stroke-width:1}
+  .f100{fill:#104281} .f80{fill:#2a78d6} .f70{fill:#6da7ec} .fglide{fill:#59636e}
+  @media (prefers-color-scheme:dark){
+    .t100{stroke:#b7d3f6} .t80{stroke:#3987e5} .t70{stroke:#1c5cab} .drag{stroke:#d95926}
+    .glide{stroke:#9198a1} .band{fill:#d95926} .stallz{fill:#9198a1} .axis{stroke:#6e7681}
+    .f100{fill:#b7d3f6} .f80{fill:#3987e5} .f70{fill:#1c5cab} .fglide{fill:#9198a1}
+  }
+</style>
+"""
+
+
+def svg(w, h, body, label, extra_style=""):
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" '
-            f'role="img" aria-label="{label}">\n{STYLE}\n'
+            f'role="img" aria-label="{label}">\n{STYLE}{extra_style}\n'
             f'<rect class="bg" x="0" y="0" width="{w}" height="{h}" rx="10"/>\n{body}\n</svg>\n')
 
 
@@ -494,9 +511,123 @@ def airframe():
                "150 mm, ready to fly 1106 g.")
 
 
+def performance():
+    """flight_model.py'nin iki sonucu: yatay ucusta itki/surukleme ve el atisi simulasyonu.
+    Model, olcum degil - varsayimlar grafigin altinda yaziyor."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import flight_model as fm
+    b = []
+    b.append(text(24, 36, "Flight performance — model", "sans h1 ink"))
+    b.append(text(24, 58, f"Full throttle at three possible static thrusts: eCalc's ≈{fm.static_g():.0f} g should "
+                          "climb, the observed slow sink needs under ~500 g", "sans s13 mute"))
+    # Testler tam gazda yapildi; bilinmeyen gaz degil, tam gazdaki statik itki (eCalc, olculmedi).
+    SERIES = ((fm.static_g(), "t100", "f100"), (650, "t80", "f80"), (450, "t70", "f70"))
+    # eCalc degeri yaklasik: onune "yaklasik" isareti; digerleri varsayimsal senaryo
+    gname = lambda g: f"≈{g:.0f} g" if abs(g - fm.static_g()) < 1 else f"{g:.0f} g"
+    # ortak lejant (iki panelde ayni kodlama)
+    lx, ly = 24, 88
+    b.append(text(lx, ly, "Static thrust:", "sans s12 b ink"))
+    lx += 96
+    leg = [(c, gname(g) + (" (eCalc)" if i == 0 else "")) for i, (g, c, _) in enumerate(SERIES)]
+    leg += [("drag", "drag = thrust needed (CD0 0.04–0.07)"), ("glide", "motor off")]
+    for cls, lab in leg:
+        b.append(f'<path class="ln {cls}" d="M{lx} {ly-4} H{lx+22}"/>')
+        b.append(text(lx + 28, ly, lab, "sans s12 ink"))
+        lx += 28 + len(lab) * 6.1 + 18
+
+    def panel(x0, y0, w, h, xr, yr, xt, yt, xlab, ylab, title):
+        sx = lambda v: round(x0 + (v - xr[0]) / (xr[1] - xr[0]) * w, 1)
+        sy = lambda v: round(y0 + h - (v - yr[0]) / (yr[1] - yr[0]) * h, 1)
+        out = [text(x0, y0 - 14, title, "sans s13 b ink")]
+        for v in yt:
+            out.append(f'<path class="rule" d="M{x0} {sy(v)} H{x0+w}"/>')
+            out.append(text(x0 - 8, sy(v) + 4, f"{v:g}", "mono s11 mute", "end"))
+        for v in xt:
+            out.append(text(sx(v), y0 + h + 18, f"{v:g}", "mono s11 mute", "middle"))
+        out.append(f'<path class="axis" d="M{x0} {y0+h} H{x0+w}"/>')
+        out.append(text(x0 + w / 2, y0 + h + 38, xlab, "sans s12 mute", "middle"))
+        out.append(text(x0 - 40, y0 + h / 2, ylab, "sans s12 mute", "middle", -90))
+        return out, sx, sy
+
+    def poly(pts, cls, sx, sy):
+        d = " ".join(f"{'M' if i == 0 else 'L'}{sx(x)} {sy(y)}" for i, (x, y) in enumerate(pts))
+        return f'<path class="ln {cls}" d="{d}"/>'
+
+    # --- sol: itki ve surukleme, hiza gore ---
+    X0, Y0, PW, PH = 80, 140, 390, 260
+    out, sx, sy = panel(X0, Y0, PW, PH, (6, 16), (0, 6), range(6, 17, 2), range(0, 7),
+                        "airspeed (m/s)", "force (N)", "Level flight: thrust available vs drag")
+    b += out
+    vs = fm.stall_speed()
+    b.append(f'<rect class="stallz" x="{sx(6)}" y="{Y0}" width="{sx(vs)-sx(6)}" height="{PH}"/>')
+    b.append(text((sx(6) + sx(vs)) / 2, sy(0.62), "below stall", "sans s11 mute", "middle"))
+    b.append(text((sx(6) + sx(vs)) / 2, sy(0.28), f"&lt; {vs:.1f} m/s", "mono s11 mute", "middle"))
+    vv = [vs + i * 0.05 for i in range(int((16 - vs) / 0.05) + 1)]
+    lo = [(v, fm.drag(v, fm.CD0_BAND[0])) for v in vv]
+    hi = [(v, fm.drag(v, fm.CD0_BAND[1])) for v in vv]
+    band = " ".join(f"{sx(x)},{sy(y)}" for x, y in lo + hi[::-1])
+    b.append(f'<polygon class="band" points="{band}"/>')
+    b.append(poly([(v, fm.drag(v)) for v in vv], "drag", sx, sy))
+    b.append(text(sx(15.9), sy(fm.drag(15.9, fm.CD0_BAND[1])) - 8, "drag", "sans s12 ink", "end"))
+    for g, cls, _ in SERIES:
+        rpm = fm.rpm_for_static(g)
+        pts = [(v, fm.thrust(v, rpm)) for v in [6 + i * 0.05 for i in range(201)]]
+        pts = [p for p in pts if p[1] > 0] + [(fm.pitch_speed(rpm), 0)]
+        b.append(poly(pts, cls, sx, sy))
+        lab_v = 6.15
+        b.append(text(sx(lab_v), sy(fm.thrust(lab_v, rpm)) - 7, gname(g), "sans s12 b ink"))
+
+    # --- sag: el atisi simulasyonu ---
+    V0, H0, CLT = 8.5, 2.0, 0.75
+    X1, TMAX, HMAX = 590, 8.0, 8
+    out, sx, sy = panel(X1, Y0, 380, PH, (0, TMAX), (0, HMAX), range(0, 9, 2), range(0, 9, 2),
+                        "seconds after release", "height (m)",
+                        f"Hand launch, simulated: {H0:g} m, {V0:g} m/s, elevator fixed")
+    b += out
+    b.append(f'<clipPath id="cp"><rect x="{X1}" y="{Y0}" width="380" height="{PH}"/></clipPath>')
+    # sonuc ozeti: sag alttaki bos alanda
+    TX, TY = sx(4.5), sy(3.4)
+    b.append(text(TX, TY, "Outcome", "sans s12 b ink"))
+    row = 0
+    for g, cls, fcls in SERIES + ((0, "glide", "fglide"),):
+        ts, hs = fm.simulate(fm.rpm_for_static(g) if g else 0, v0=V0, h0=H0, cl_trim=CLT, t_end=TMAX)
+        pts = [(t, h) for t, h in zip(ts, hs)][::10] + [(ts[-1], hs[-1])]
+        b.append(f'<g clip-path="url(#cp)">{poly(pts, cls, sx, sy)}</g>')
+        name = gname(g) if g else "motor off"
+        if hs[-1] <= 0:   # yere degdi
+            b.append(f'<circle class="{fcls}" cx="{sx(ts[-1])}" cy="{sy(0)}" r="4"/>')
+            res = f"down at {ts[-1]:.1f} s"
+        elif max(hs) >= HMAX:   # ustten cikiyor: etiketi cikis noktasina
+            te = next(t for t, h in zip(ts, hs) if h >= HMAX)
+            b.append(text(sx(te) - 8, sy(HMAX) + 14, name, "sans s12 b ink", "end"))
+            res = "climbs"
+        else:
+            b.append(text(sx(TMAX) - 4, sy(hs[-1]) - 8, name, "sans s12 b ink", "end"))
+            res = "climbs slowly" if hs[-1] > H0 + 1 else f"holds {min(hs):.0f}–{max(hs):.0f} m"
+        yy = TY + 18 + row * 17
+        b.append(f'<path class="ln {cls}" d="M{TX} {yy-4} H{TX+18}"/>')
+        b.append(text(TX + 24, yy, name, "sans s12 ink"))
+        b.append(text(TX + 88, yy, res, "sans s12 ink"))
+        row += 1
+
+    b.append(text(24, 470, f"Model, not a measurement. CL max {fm.CL_MAX}, CD0 {fm.CD0} "
+                           f"(band {fm.CD0_BAND[0]}–{fm.CD0_BAND[1]}), Oswald {fm.E_OSW}, "
+                           f"≈{fm.static_g():.0f} g static from eCalc (not measured), thrust vs speed by Staples' equation, "
+                           f"1106 g, 28 dm², air {fm.RHO} kg/m³.", "sans s11 mute"))
+    vt = (2 * fm.W / (fm.RHO * fm.S * CLT)) ** 0.5
+    b.append(text(24, 486, f"Launch trimmed for {vt:.1f} m/s, no pilot input. Source: docs/diagrams/flight_model.py",
+                  "sans s11 mute"))
+    return svg(1000, 504, "\n".join(b),
+               "Two charts from a simple performance model at full throttle, for three possible static thrusts: "
+               "about 912 grams from eCalc, 650 and 450 grams. Left: thrust against drag versus airspeed; stall is about "
+               "8.5 metres per second and at 450 grams thrust never exceeds drag. Right: simulated hand launch "
+               "from 2 metres at 8.5 metres per second; with 912 and 650 grams the aircraft climbs away, with "
+               "450 grams it sinks to the ground, with the motor off it is down in 1.6 seconds.", CHART_STYLE)
+
+
 os.makedirs(OUT, exist_ok=True)
 for name, fn in (("aircraft_wiring.svg", aircraft), ("ground_station_wiring.svg", ground_station),
-                 ("airframe_layout.svg", airframe)):
+                 ("airframe_layout.svg", airframe), ("flight_performance.svg", performance)):
     with open(os.path.join(OUT, name), "w", encoding="utf-8", newline="\n") as fh:
         fh.write(fn())
     print("yazildi", name)
