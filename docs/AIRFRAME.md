@@ -5,7 +5,7 @@ Aileron yok: yatış, kanadın dihedral kırımı ve rudder ile sağlanıyor.
 
 Aşağıdaki değerler **yapılmış uçağın** değerleri. İlk tasarım planından üç önemli fark var:
 polihedral (640/380 bölünmesi) terk edildi ve dihedral tam ortaya alındı, kanat hücum kenarı
-montajda 285 yerine 230'a geldi, uçuşa hazır ağırlık 976 g tahmini yerine **1105 g** çıktı.
+montajda 285 yerine 230'a geldi, uçuşa hazır ağırlık 976 g tahmini yerine **1106 g** çıktı.
 
 ![Gövde ölçüleri](diagrams/airframe_layout.svg)
 
@@ -53,7 +53,7 @@ Tüm ölçüler mm. Sıfır noktası firewall.
 | | |
 |---|---|
 | Kanat hücum kenarı | x=230 *(tasarımda 285 idi, montajda 230'a geldi)* |
-| **Ağırlık merkezi** | **x=280** — hücum kenarından 50 mm, veterin %25'i |
+| **Ağırlık merkezi** | **x=278** (ölçülen) — hücum kenarından 48 mm, veterin %24'ü; hedef x=280 (%25) |
 
 - **Batarya cırt bantla ayarlanabilir.** CG'nin tek düzeltme aracı bu; kurşun eklenmiyor.
 - **Kanat gövdeye yapışık değil:** iki ahşap pim + kauçuk lastik. Sert bir inişte kanat
@@ -113,7 +113,7 @@ ekler, doubler'lar, firewall → ara bölmeler → **UBEC hattını masada dene*
 
 | | |
 |---|---|
-| Uçuşa hazır | **1105 g** |
+| Uçuşa hazır | **1106 g** |
 | Kanat yükü | 39,5 g/dm² |
 | İtki/ağırlık | ~0,8 |
 
@@ -133,5 +133,5 @@ düşüyorsa bataryayı öne kaydır.
 | Kanat kırımı | Polihedral, 640 + 380 panel, ±320'de kırım | 10° dihedral, ortadan tek kırım |
 | Kanat hücum kenarı | x=285 | x=230 |
 | 5 V | ESC'nin BEC'i | Ayrı UBEC 5 V / 3 A, ESC BEC devre dışı |
-| Ağırlık | 976 g tahmini | 1105 g ölçülen |
+| Ağırlık | 976 g tahmini | 1106 g ölçülen |
 | Kanat yükü | 35 g/dm² | 39,5 g/dm² |

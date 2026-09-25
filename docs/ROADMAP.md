@@ -30,7 +30,7 @@ Kısa işler, hepsi bugün bitebilir:
       `controller_software/README.md` ve `RF_PROTOKOL.md` hâlâ 10 byte diyor; protokol
       belgesinin başlığı "Sürüm 2".
 - [ ] Ayarlar'daki **3 kanal / 4 kanal** seçimi hiçbir README'de anlatılmıyor.
-- [ ] Tartılmış ağırlık ve ölçülen CG → `AIRFRAME.md` tablosundaki tahminlerin yerine.
+- [x] Tartılmış ağırlık ve ölçülen CG → `AIRFRAME.md` tablosundaki tahminlerin yerine.
 
 ## 2. Link güvenliği — kimlik doğrulama ve tekrar koruması
 

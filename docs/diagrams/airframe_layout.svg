@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 730" width="1000" height="730" role="img" aria-label="Airframe top, side and front views as built. Wingspan 1400 mm, constant 200 mm chord, 10 degree dihedral with a single break at the centre, fuselage 1050 mm, wing leading edge 230 mm behind the firewall, CG 280 mm on the spar line at 25 percent chord, stabiliser 400 by 150 mm, ready to fly 1105 g.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 730" width="1000" height="730" role="img" aria-label="Airframe top, side and front views as built. Wingspan 1400 mm, constant 200 mm chord, 10 degree dihedral with a single break at the centre, fuselage 1050 mm, wing leading edge 230 mm behind the firewall, CG 278 mm just ahead of the spar at 24 percent chord, stabiliser 400 by 150 mm, ready to fly 1106 g.">
 
 <style>
   .bg{fill:#f6f8fa} .card{fill:#ffffff;stroke:#d1d9e0;stroke-width:1}
@@ -69,9 +69,9 @@
 
 <rect class="outline" x="488.0" y="286.0" width="63.0" height="168.0"/>
 <rect class="dot" x="492.2" y="368.5" width="58.8" height="3"/>
-<circle class="outline" cx="227.6" cy="370" r="10"/><path class="dot" d="M227.6 370 V360 A10 10 0 0 1 237.6 370 Z"/><path class="dot" d="M227.6 370 V380 A10 10 0 0 1 217.6 370 Z"/>
+<circle class="outline" cx="226.8" cy="370" r="10"/><path class="dot" d="M226.8 370 V360 A10 10 0 0 1 236.8 370 Z"/><path class="dot" d="M226.8 370 V380 A10 10 0 0 1 216.8 370 Z"/>
 
-<text class="sans s12 b ink" x="241.6" y="350">CG</text>
+<text class="sans s12 b ink" x="240.8" y="350">CG</text>
 
 <path class="ext" d="M206.6 76.0 H44 M206.6 664.0 H44"/>
 <path class="dim" d="M50 76.0 V664.0"/><path class="arrow" d="M50 76.0 l-3.5 7 h7 z"/><path class="arrow" d="M50 664.0 l-3.5 -7 h7 z"/>
@@ -119,9 +119,9 @@
 <path class="thin" style="stroke-width:3" d="M680 193 H736.0"/>
 <text class="sans s11 mute" x="708.0" y="210" text-anchor="middle">sacrificial strip</text>
 
-<circle class="outline" cx="758.4" cy="178.8" r="7"/><path class="dot" d="M758.4 178.8 V171.8 A7 7 0 0 1 765.4 178.8 Z"/><path class="dot" d="M758.4 178.8 V185.8 A7 7 0 0 1 751.4 178.8 Z"/>
+<circle class="outline" cx="757.8" cy="178.8" r="7"/><path class="dot" d="M757.8 178.8 V171.8 A7 7 0 0 1 764.8 178.8 Z"/><path class="dot" d="M757.8 178.8 V185.8 A7 7 0 0 1 750.8 178.8 Z"/>
 
-<text class="sans s12 b ink" x="770.4" y="210">CG</text>
+<text class="sans s12 b ink" x="769.8" y="210">CG</text>
 
 <text class="sans s11 mute" x="772.4" y="153.6" text-anchor="middle">high wing · +1.4° incidence</text>
 
@@ -175,7 +175,7 @@
 <path class="rule" d="M640 573 H980"/>
 <text class="sans s13 ink" x="640" y="590">CG</text>
 
-<text class="mono s13 ink" x="980" y="590" text-anchor="end">280 · 50 behind LE (25 %)</text>
+<text class="mono s13 ink" x="980" y="590" text-anchor="end">278 · 48 behind LE (24 %)</text>
 
 <path class="rule" d="M640 597 H980"/>
 <text class="sans s13 ink" x="640" y="614">Incidence</text>
@@ -195,7 +195,7 @@
 <path class="rule" d="M640 669 H980"/>
 <text class="sans s13 ink" x="640" y="686">Ready to fly</text>
 
-<text class="mono s13 ink" x="980" y="686" text-anchor="end">1105 g · 39.5 g/dm²</text>
+<text class="mono s13 ink" x="980" y="686" text-anchor="end">1106 g · 39.5 g/dm²</text>
 
 <path class="rule" d="M640 693 H980"/>
 <text class="sans s11 mute" x="640" y="706">Motor 2° down, 2° right · elevator ±14 mm, rudder ±20 mm.</text>

@@ -32,7 +32,7 @@ that happens when the link degrades.
 ## 📐 Mechanics
 
 <p align="center">
-  <img src="docs/diagrams/airframe_layout.svg" width="820" alt="Airframe top, side and front views with dimensions: 1400 mm span, 200 mm chord, 1050 mm fuselage, CG 50 mm behind the leading edge">
+  <img src="docs/diagrams/airframe_layout.svg" width="820" alt="Airframe top, side and front views with dimensions: 1400 mm span, 200 mm chord, 1050 mm fuselage, CG 48 mm behind the leading edge">
 </p>
 
 | | |
@@ -41,9 +41,9 @@ that happens when the link degrades.
 | **Wing** | 1400 mm span, 200 mm constant chord, 28 dm², high wing, +1.4° incidence |
 | **Control** | 3 channels — throttle, elevator, rudder; roll from rudder via 10° dihedral |
 | **Tail** | 400 × 150 mm stabiliser (Vh 0.70), 180 mm fin (Vv 0.036) |
-| **CG** | 280 mm from the firewall: 50 mm behind the leading edge (25 %), on the spar line |
+| **CG** | 278 mm from the firewall (measured): 48 mm behind the leading edge (24 %), just ahead of the spar |
 | **Power** | A2212 1000 KV, 10×4.5 prop, 30 A ESC, 3S 2200 mAh 30C |
-| **Weight** | 1105 g ready to fly, 39.5 g/dm² wing loading, thrust/weight ≈ 0.8 |
+| **Weight** | 1106 g ready to fly, 39.5 g/dm² wing loading, thrust/weight ≈ 0.8 |
 
 Tail volumes and CG are calculated, not guessed. Crashes are designed to be
 cheap: the wing sits on **two dowels and rubber bands**, so a hard landing pops it off
@@ -276,8 +276,7 @@ Turkish.
 First field tests took place on **21 September 2026**: hand launches from a ploughed field,
 the best of them about ten seconds in the air (clip at the top).
 
-* **CG and trim** — re-measure the balance point since the wing moved to 230 mm, trim from
-  flight.
+* **Trim** — CG re-measured at 278 mm (24 % chord) with the wing at 230 mm; trim from flight.
 * **Soldered board** — the electronics still sit on a breadboard inside the fuselage.
 * **Battery telemetry** — `bataryaOku()` returns 0 today; needs a divider on an ADC1 pin.
 * **Physical sticks** — a gimbal transmitter to replace the browser UI as primary control.

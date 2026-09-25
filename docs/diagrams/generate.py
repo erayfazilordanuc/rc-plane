@@ -379,7 +379,7 @@ def cg(x, y, r=10):
 
 def airframe():
     """Ucagin YAPILMIS hali. Tasarim planindan farklari: polihedral yerine ortadan
-    tek dihedral kirimi, kanat HK 285 yerine 230, agirlik 1105 g."""
+    tek dihedral kirimi, kanat HK 285 yerine 230, agirlik 1106 g, CG x=278."""
     s = 0.42
     fx, cy = 110, 370                     # firewall, govde ekseni
     X = lambda mm: round(fx + mm * s, 1)  # istasyon -> px
@@ -407,8 +407,8 @@ def airframe():
     # yatay + dikey dengeleyici
     b.append(f'<rect class="outline" x="{X(900)}" y="{Y(-200)}" width="{round(150*s,1)}" height="{round(400*s,1)}"/>')
     b.append(f'<rect class="dot" x="{X(910)}" y="{cy-1.5}" width="{round(140*s,1)}" height="3"/>')
-    b.append(cg(X(280), cy))
-    b.append(text(X(280) + 14, cy - 20, "CG", "sans s12 b ink"))
+    b.append(cg(X(278), cy))
+    b.append(text(X(278) + 14, cy - 20, "CG", "sans s12 b ink"))
     # olculer
     b.append(f'<path class="ext" d="M{le} {Y(-700)} H44 M{le} {Y(700)} H44"/>')
     b.append(arrow_v(50, Y(-700), Y(700)))
@@ -452,8 +452,8 @@ def airframe():
     # burun altinda kurban seridi
     b.append(f'<path class="thin" style="stroke-width:3" d="M{sx} {base+3} H{SX(200)}"/>')
     b.append(text(SX(100), base + 20, "sacrificial strip", "sans s11 mute", "middle"))
-    b.append(cg(SX(280), round(base - 40 * t, 1), 7))
-    b.append(text(SX(280) + 12, base + 20, "CG", "sans s12 b ink"))
+    b.append(cg(SX(278), round(base - 40 * t, 1), 7))
+    b.append(text(SX(278) + 12, base + 20, "CG", "sans s12 b ink"))
     b.append(text(SX(330), top_f - 14, "high wing · +1.4° incidence", "sans s11 mute", "middle"))
     b.append(text(SX(1050), fin_top - 10, "stab 0° · decalage 1.4°", "sans s11 mute", "end"))
     # on gorunus
@@ -476,9 +476,9 @@ def airframe():
     rows = [("Wingspan", "1400"), ("Chord", "200, constant"), ("Wing area", "28 dm²"),
             ("Airfoil", "KFm-2, step 100 from LE"), ("Dihedral", "10° · one break at centre"),
             ("Fuselage", "1050 × 75 × 80"), ("Wing LE", "230 from firewall"),
-            ("CG", "280 · 50 behind LE (25 %)"), ("Incidence", "wing +1.4° · stab 0°"),
+            ("CG", "278 · 48 behind LE (24 %)"), ("Incidence", "wing +1.4° · stab 0°"),
             ("Horizontal stab", "400 × 150 · Vh 0.70"), ("Fin", "180 high · Vv 0.036"),
-            ("Ready to fly", "1105 g · 39.5 g/dm²")]
+            ("Ready to fly", "1106 g · 39.5 g/dm²")]
     b.append(text(R, 398, "KEY NUMBERS", "sans s12 b mute"))
     for i, (k, v) in enumerate(rows):
         yy = 422 + i * 24
@@ -490,8 +490,8 @@ def airframe():
     return svg(1000, 730, "\n".join(b),
                "Airframe top, side and front views as built. Wingspan 1400 mm, constant 200 mm chord, "
                "10 degree dihedral with a single break at the centre, fuselage 1050 mm, wing leading edge 230 mm "
-               "behind the firewall, CG 280 mm on the spar line at 25 percent chord, stabiliser 400 by "
-               "150 mm, ready to fly 1105 g.")
+               "behind the firewall, CG 278 mm just ahead of the spar at 24 percent chord, stabiliser 400 by "
+               "150 mm, ready to fly 1106 g.")
 
 
 os.makedirs(OUT, exist_ok=True)
